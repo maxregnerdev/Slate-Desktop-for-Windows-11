@@ -113,12 +113,12 @@ class FloatingTaskbarModule:
                     text=True
                 )
                 if result.returncode == 0:
-                    print(f"✓ Installed: {cmd}")
+                    print(f"[+] Installed: {cmd}")
                     success_count += 1
                 else:
-                    print(f"✗ Failed to install: {cmd}")
+                    print(f"[-] Failed to install: {cmd}")
             except Exception as e:
-                print(f"✗ Error installing dependency: {e}")
+                print(f"[-] Error installing dependency: {e}")
         
         return success_count == len(winget_commands)
     
@@ -170,9 +170,9 @@ class FloatingTaskbarModule:
                         winreg.SetValueEx(key, tweak['value'], 0, tweak['type'], tweak['data'])
                         applied += 1
             except Exception as e:
-                print(f"✗ Error applying registry tweak: {e}")
+                print(f"[-] Error applying registry tweak: {e}")
         
-        print(f"✓ Applied {applied} registry tweaks")
+        print(f"[+] Applied {applied} registry tweaks")
         return applied > 0
     
     def configure_windhawk(self) -> bool:
@@ -211,10 +211,10 @@ class FloatingTaskbarModule:
             with open(config_file, 'w') as f:
                 json.dump(windhawk_config, f, indent=4)
             
-            print(f"✓ Windhawk configuration saved to {config_file}")
+            print(f"[+] Windhawk configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring Windhawk: {e}")
+            print(f"[-] Error configuring Windhawk: {e}")
             return False
     
     def configure_translucenttb(self) -> bool:
@@ -240,10 +240,10 @@ class FloatingTaskbarModule:
             with open(config_file, 'w') as f:
                 json.dump(ttb_config, f, indent=4)
             
-            print(f"✓ TranslucentTB configuration saved to {config_file}")
+            print(f"[+] TranslucentTB configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring TranslucentTB: {e}")
+            print(f"[-] Error configuring TranslucentTB: {e}")
             return False
     
     def create_taskbar_script(self) -> bool:
@@ -290,10 +290,10 @@ Write-Host "Windows 12 Floating Taskbar configuration applied!" -ForegroundColor
             with open(script_file, 'w') as f:
                 f.write(script_content)
             
-            print(f"✓ Taskbar script created: {script_file}")
+            print(f"[+] Taskbar script created: {script_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating taskbar script: {e}")
+            print(f"[-] Error creating taskbar script: {e}")
             return False
     
     def install(self) -> bool:
@@ -307,35 +307,35 @@ Write-Host "Windows 12 Floating Taskbar configuration applied!" -ForegroundColor
         
         # Step 1: Check dependencies
         if not self.check_dependencies():
-            print(f"⚠ Dependencies missing. Installing...")
+            print(f"[!] Dependencies missing. Installing...")
             if not self.install_dependencies():
-                print(f"✗ Failed to install dependencies")
+                print(f"[-] Failed to install dependencies")
                 success = False
         
         # Step 2: Apply registry tweaks
         if not self.apply_registry_tweaks():
-            print(f"✗ Failed to apply registry tweaks")
+            print(f"[-] Failed to apply registry tweaks")
             success = False
         
         # Step 3: Configure Windhawk
         if not self.configure_windhawk():
-            print(f"✗ Failed to configure Windhawk")
+            print(f"[-] Failed to configure Windhawk")
             success = False
         
         # Step 4: Configure TranslucentTB
         if not self.configure_translucenttb():
-            print(f"✗ Failed to configure TranslucentTB")
+            print(f"[-] Failed to configure TranslucentTB")
             success = False
         
         # Step 5: Create configuration script
         if not self.create_taskbar_script():
-            print(f"✗ Failed to create configuration script")
+            print(f"[-] Failed to create configuration script")
             success = False
         
         if success:
-            print(f"\n✓ {self.name} installed successfully!")
+            print(f"\n[+] {self.name} installed successfully!")
         else:
-            print(f"\n✗ {self.name} installation completed with errors")
+            print(f"\n[-] {self.name} installation completed with errors")
         
         return success
     
@@ -348,21 +348,21 @@ Write-Host "Windows 12 Floating Taskbar configuration applied!" -ForegroundColor
             config_file = Path.home() / '.windhawk' / 'taskbar_floating.json'
             if config_file.exists():
                 config_file.unlink()
-                print(f"✓ Removed Windhawk configuration")
+                print(f"[+] Removed Windhawk configuration")
             
             # Remove TranslucentTB configuration
             ttb_config = Path.home() / 'AppData' / 'Local' / 'TranslucentTB' / 'config.json'
             if ttb_config.exists():
                 ttb_config.unlink()
-                print(f"✓ Removed TranslucentTB configuration")
+                print(f"[+] Removed TranslucentTB configuration")
             
             # Reset registry settings
             self.reset_registry()
             
-            print(f"✓ {self.name} uninstalled successfully!")
+            print(f"[+] {self.name} uninstalled successfully!")
             return True
         except Exception as e:
-            print(f"✗ Error uninstalling: {e}")
+            print(f"[-] Error uninstalling: {e}")
             return False
     
     def reset_registry(self) -> bool:
@@ -392,10 +392,10 @@ Write-Host "Windows 12 Floating Taskbar configuration applied!" -ForegroundColor
                 except:
                     pass
             
-            print(f"✓ Registry settings reset")
+            print(f"[+] Registry settings reset")
             return True
         except Exception as e:
-            print(f"✗ Error resetting registry: {e}")
+            print(f"[-] Error resetting registry: {e}")
             return False
     
     def get_status(self) -> Dict[str, Any]:

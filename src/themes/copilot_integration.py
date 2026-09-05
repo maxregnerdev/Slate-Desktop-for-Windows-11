@@ -184,12 +184,12 @@ class Copilot2IntegrationModule:
                     text=True
                 )
                 if result.returncode == 0:
-                    print(f"✓ Installed: {cmd}")
+                    print(f"[+] Installed: {cmd}")
                     success_count += 1
                 else:
-                    print(f"✗ Failed to install: {cmd}")
+                    print(f"[-] Failed to install: {cmd}")
             except Exception as e:
-                print(f"✗ Error installing dependency: {e}")
+                print(f"[-] Error installing dependency: {e}")
         
         return success_count == len(winget_commands)
     
@@ -259,9 +259,9 @@ class Copilot2IntegrationModule:
                         winreg.SetValueEx(key, tweak['value'], 0, tweak['type'], tweak['data'])
                         applied += 1
             except Exception as e:
-                print(f"✗ Error applying registry tweak: {e}")
+                print(f"[-] Error applying registry tweak: {e}")
         
-        print(f"✓ Applied {applied} registry tweaks")
+        print(f"[+] Applied {applied} registry tweaks")
         return applied > 0
     
     def configure_copilot_integration(self) -> bool:
@@ -295,10 +295,10 @@ class Copilot2IntegrationModule:
             with open(config_file, 'w') as f:
                 json.dump(copilot_config, f, indent=4)
             
-            print(f"✓ Copilot 2.0 integration configuration saved to {config_file}")
+            print(f"[+] Copilot 2.0 integration configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring Copilot 2.0 integration: {e}")
+            print(f"[-] Error configuring Copilot 2.0 integration: {e}")
             return False
     
     def configure_powertoys_copilot(self) -> bool:
@@ -344,10 +344,10 @@ class Copilot2IntegrationModule:
             with open(config_file, 'w') as f:
                 json.dump(pt_config, f, indent=4)
             
-            print(f"✓ PowerToys Copilot configuration saved to {config_file}")
+            print(f"[+] PowerToys Copilot configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring PowerToys Copilot: {e}")
+            print(f"[-] Error configuring PowerToys Copilot: {e}")
             return False
     
     def create_copilot_scripts(self) -> bool:
@@ -379,11 +379,11 @@ class Copilot2IntegrationModule:
                 with open(script_file, 'w') as f:
                     f.write(script['content'])
                 created += 1
-                print(f"✓ Created script: {script_file}")
+                print(f"[+] Created script: {script_file}")
             
             return created > 0
         except Exception as e:
-            print(f"✗ Error creating Copilot scripts: {e}")
+            print(f"[-] Error creating Copilot scripts: {e}")
             return False
     
     def create_copilot_integration_script(self) -> str:
@@ -632,10 +632,10 @@ Write-Host "Copilot 2.0 Service management completed!" -ForegroundColor Green
             with open(config_file, 'w') as f:
                 json.dump(copilot_config, f, indent=4)
             
-            print(f"✓ Copilot 2.0 configuration saved to {config_file}")
+            print(f"[+] Copilot 2.0 configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating Copilot 2.0 configuration: {e}")
+            print(f"[-] Error creating Copilot 2.0 configuration: {e}")
             return False
     
     def install(self) -> bool:
@@ -649,40 +649,40 @@ Write-Host "Copilot 2.0 Service management completed!" -ForegroundColor Green
         
         # Step 1: Check dependencies
         if not self.check_dependencies():
-            print(f"⚠ Dependencies missing. Installing...")
+            print(f"[!] Dependencies missing. Installing...")
             if not self.install_dependencies():
-                print(f"✗ Failed to install dependencies")
+                print(f"[-] Failed to install dependencies")
                 success = False
         
         # Step 2: Apply registry tweaks
         if not self.apply_registry_tweaks():
-            print(f"✗ Failed to apply registry tweaks")
+            print(f"[-] Failed to apply registry tweaks")
             success = False
         
         # Step 3: Configure Copilot 2.0 integration
         if not self.configure_copilot_integration():
-            print(f"✗ Failed to configure Copilot 2.0 integration")
+            print(f"[-] Failed to configure Copilot 2.0 integration")
             success = False
         
         # Step 4: Configure PowerToys Copilot
         if not self.configure_powertoys_copilot():
-            print(f"✗ Failed to configure PowerToys Copilot")
+            print(f"[-] Failed to configure PowerToys Copilot")
             success = False
         
         # Step 5: Create Copilot scripts
         if not self.create_copilot_scripts():
-            print(f"✗ Failed to create Copilot scripts")
+            print(f"[-] Failed to create Copilot scripts")
             success = False
         
         # Step 6: Create Copilot configuration
         if not self.create_copilot_config():
-            print(f"✗ Failed to create Copilot configuration")
+            print(f"[-] Failed to create Copilot configuration")
             success = False
         
         if success:
-            print(f"\n✓ {self.name} installed successfully!")
+            print(f"\n[+] {self.name} installed successfully!")
         else:
-            print(f"\n✗ {self.name} installation completed with errors")
+            print(f"\n[-] {self.name} installation completed with errors")
         
         return success
     
@@ -695,19 +695,19 @@ Write-Host "Copilot 2.0 Service management completed!" -ForegroundColor Green
             copilot_config = Path.home() / 'AppData' / 'Local' / 'Microsoft' / 'Copilot' / 'windows12_config.json'
             if copilot_config.exists():
                 copilot_config.unlink()
-                print(f"✓ Removed Copilot 2.0 integration configuration")
+                print(f"[+] Removed Copilot 2.0 integration configuration")
             
             # Remove PowerToys Copilot configuration
             pt_config = Path.home() / 'AppData' / 'Local' / 'Microsoft' / 'PowerToys' / 'copilot_config.json'
             if pt_config.exists():
                 pt_config.unlink()
-                print(f"✓ Removed PowerToys Copilot configuration")
+                print(f"[+] Removed PowerToys Copilot configuration")
             
             # Remove Copilot configuration
             config_file = Path(__file__).parent.parent.parent.parent / 'config' / 'Windows12' / 'copilot_integration_config.json'
             if config_file.exists():
                 config_file.unlink()
-                print(f"✓ Removed Copilot 2.0 configuration")
+                print(f"[+] Removed Copilot 2.0 configuration")
             
             # Remove Copilot scripts
             scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
@@ -715,15 +715,15 @@ Write-Host "Copilot 2.0 Service management completed!" -ForegroundColor Green
                 script_file = scripts_dir / script_name
                 if script_file.exists():
                     script_file.unlink()
-                    print(f"✓ Removed script: {script_name}")
+                    print(f"[+] Removed script: {script_name}")
             
             # Reset registry settings
             self.reset_registry()
             
-            print(f"✓ {self.name} uninstalled successfully!")
+            print(f"[+] {self.name} uninstalled successfully!")
             return True
         except Exception as e:
-            print(f"✗ Error uninstalling: {e}")
+            print(f"[-] Error uninstalling: {e}")
             return False
     
     def reset_registry(self) -> bool:
@@ -774,10 +774,10 @@ Write-Host "Copilot 2.0 Service management completed!" -ForegroundColor Green
                 except:
                     pass
             
-            print(f"✓ Registry settings reset")
+            print(f"[+] Registry settings reset")
             return True
         except Exception as e:
-            print(f"✗ Error resetting registry: {e}")
+            print(f"[-] Error resetting registry: {e}")
             return False
     
     def get_status(self) -> Dict[str, Any]:

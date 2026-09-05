@@ -146,17 +146,17 @@ class Windows12ThemeModule:
                     text=True
                 )
                 if result.returncode == 0:
-                    print(f"✓ Installed: {cmd}")
+                    print(f"[+] Installed: {cmd}")
                     success_count += 1
                 else:
-                    print(f"✗ Failed to install: {cmd}")
+                    print(f"[-] Failed to install: {cmd}")
             except Exception as e:
-                print(f"✗ Error installing dependency: {e}")
+                print(f"[-] Error installing dependency: {e}")
         
         # Manual dependencies
         manual_deps = ['UXThemePatcher', '7TSP']
         for dep in manual_deps:
-            print(f"⚠ {dep} requires manual installation")
+            print(f"[!] {dep} requires manual installation")
         
         return success_count == len(winget_commands)
     
@@ -244,9 +244,9 @@ class Windows12ThemeModule:
                         winreg.SetValueEx(key, tweak['value'], 0, tweak['type'], tweak['data'])
                         applied += 1
             except Exception as e:
-                print(f"✗ Error applying registry tweak: {e}")
+                print(f"[-] Error applying registry tweak: {e}")
         
-        print(f"✓ Applied {applied} registry tweaks")
+        print(f"[+] Applied {applied} registry tweaks")
         return applied > 0
     
     def patch_system_files(self) -> bool:
@@ -262,16 +262,16 @@ class Windows12ThemeModule:
             )
             
             if result.returncode == 0:
-                print(f"✓ SecureUXTheme is running")
+                print(f"[+] SecureUXTheme is running")
             else:
-                print(f"⚠ SecureUXTheme not running, attempting to start...")
+                print(f"[!] SecureUXTheme not running, attempting to start...")
                 # Try to start SecureUXTheme
                 secureux_path = Path(r'C:\Program Files\SecureUxTheme\ThemeTool.exe')
                 if secureux_path.exists():
                     subprocess.Popen([str(secureux_path)])
-                    print(f"✓ Started SecureUXTheme")
+                    print(f"[+] Started SecureUXTheme")
                 else:
-                    print(f"✗ SecureUXTheme not found")
+                    print(f"[-] SecureUXTheme not found")
                     return False
             
             # Apply theme using UXThemePatcher if needed
@@ -283,16 +283,16 @@ class Windows12ThemeModule:
                     text=True
                 )
                 if result.returncode == 0:
-                    print(f"✓ Applied UXThemePatcher")
+                    print(f"[+] Applied UXThemePatcher")
                 else:
-                    print(f"✗ UXThemePatcher failed")
+                    print(f"[-] UXThemePatcher failed")
                     return False
             
-            print(f"✓ System files patched successfully")
+            print(f"[+] System files patched successfully")
             return True
             
         except Exception as e:
-            print(f"✗ Error patching system files: {e}")
+            print(f"[-] Error patching system files: {e}")
             return False
     
     def install_theme_files(self) -> bool:
@@ -321,21 +321,21 @@ class Windows12ThemeModule:
                     if source_file.exists():
                         dest_file = themes_dir / theme_file
                         shutil.copy2(source_file, dest_file)
-                        print(f"✓ Copied: {theme_file}")
+                        print(f"[+] Copied: {theme_file}")
                         copied += 1
                 
                 if copied > 0:
-                    print(f"✓ Copied {copied} theme files")
+                    print(f"[+] Copied {copied} theme files")
                     return True
                 else:
-                    print(f"✗ No theme files found in sources")
+                    print(f"[-] No theme files found in sources")
                     return False
             else:
-                print(f"✗ Theme files not found in sources")
+                print(f"[-] Theme files not found in sources")
                 return False
                 
         except Exception as e:
-            print(f"✗ Error installing theme files: {e}")
+            print(f"[-] Error installing theme files: {e}")
             return False
     
     def install_icons(self) -> bool:
@@ -346,7 +346,7 @@ class Windows12ThemeModule:
             # Check if 7TSP is installed
             tsp_path = Path(r'C:\Program Files\7TSP\7tsp_gui.exe')
             if not tsp_path.exists():
-                print(f"⚠ 7TSP not found, icon installation may not work")
+                print(f"[!] 7TSP not found, icon installation may not work")
             
             # Check if icon files exist in sources
             source_icons_dir = self.theme_paths['resources'] / 'Step 2 - Windows 12 Icons'
@@ -356,19 +356,19 @@ class Windows12ThemeModule:
                 icon_files = list(source_icons_dir.glob('*.mun'))
                 
                 if icon_files:
-                    print(f"✓ Found {len(icon_files)} icon files")
+                    print(f"[+] Found {len(icon_files)} icon files")
                     # This would be applied through 7TSP GUI or command line
-                    print(f"⚠ Icons need to be applied manually through 7TSP")
+                    print(f"[!] Icons need to be applied manually through 7TSP")
                     return True
                 else:
-                    print(f"✗ No icon files found")
+                    print(f"[-] No icon files found")
                     return False
             else:
-                print(f"✗ Icon files not found in sources")
+                print(f"[-] Icon files not found in sources")
                 return False
                 
         except Exception as e:
-            print(f"✗ Error installing icons: {e}")
+            print(f"[-] Error installing icons: {e}")
             return False
     
     def create_theme_config(self) -> bool:
@@ -404,10 +404,10 @@ class Windows12ThemeModule:
             with open(config_file, 'w') as f:
                 json.dump(theme_config, f, indent=4)
             
-            print(f"✓ Theme configuration saved to {config_file}")
+            print(f"[+] Theme configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating theme configuration: {e}")
+            print(f"[-] Error creating theme configuration: {e}")
             return False
     
     def create_theme_script(self) -> bool:
@@ -483,10 +483,10 @@ if (Test-Path "C:\\Program Files\\7TSP\\7tsp_gui.exe") {
             with open(script_file, 'w') as f:
                 f.write(script_content)
             
-            print(f"✓ Theme script created: {script_file}")
+            print(f"[+] Theme script created: {script_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating theme script: {e}")
+            print(f"[-] Error creating theme script: {e}")
             return False
     
     def install(self) -> bool:
@@ -500,45 +500,45 @@ if (Test-Path "C:\\Program Files\\7TSP\\7tsp_gui.exe") {
         
         # Step 1: Check dependencies
         if not self.check_dependencies():
-            print(f"⚠ Dependencies missing. Installing...")
+            print(f"[!] Dependencies missing. Installing...")
             if not self.install_dependencies():
-                print(f"✗ Failed to install dependencies")
+                print(f"[-] Failed to install dependencies")
                 success = False
         
         # Step 2: Apply registry tweaks
         if not self.apply_registry_tweaks():
-            print(f"✗ Failed to apply registry tweaks")
+            print(f"[-] Failed to apply registry tweaks")
             success = False
         
         # Step 3: Patch system files
         if not self.patch_system_files():
-            print(f"✗ Failed to patch system files")
+            print(f"[-] Failed to patch system files")
             success = False
         
         # Step 4: Install theme files
         if not self.install_theme_files():
-            print(f"✗ Failed to install theme files")
+            print(f"[-] Failed to install theme files")
             success = False
         
         # Step 5: Install icons
         if not self.install_icons():
-            print(f"✗ Failed to install icons")
+            print(f"[-] Failed to install icons")
             success = False
         
         # Step 6: Create theme configuration
         if not self.create_theme_config():
-            print(f"✗ Failed to create theme configuration")
+            print(f"[-] Failed to create theme configuration")
             success = False
         
         # Step 7: Create theme script
         if not self.create_theme_script():
-            print(f"✗ Failed to create theme script")
+            print(f"[-] Failed to create theme script")
             success = False
         
         if success:
-            print(f"\n✓ {self.name} installed successfully!")
+            print(f"\n[+] {self.name} installed successfully!")
         else:
-            print(f"\n✗ {self.name} installation completed with errors")
+            print(f"\n[-] {self.name} installation completed with errors")
         
         return success
     
@@ -560,32 +560,32 @@ if (Test-Path "C:\\Program Files\\7TSP\\7tsp_gui.exe") {
                 theme_path = themes_dir / theme_file
                 if theme_path.exists():
                     theme_path.unlink()
-                    print(f"✓ Removed: {theme_file}")
+                    print(f"[+] Removed: {theme_file}")
                     removed += 1
             
             if removed > 0:
-                print(f"✓ Removed {removed} theme files")
+                print(f"[+] Removed {removed} theme files")
             
             # Remove theme configuration
             config_file = Path(__file__).parent.parent.parent.parent / 'config' / 'Windows12' / 'windows12_theme_config.json'
             if config_file.exists():
                 config_file.unlink()
-                print(f"✓ Removed theme configuration")
+                print(f"[+] Removed theme configuration")
             
             # Remove theme script
             scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
             theme_script = scripts_dir / 'configure_windows12_theme.ps1'
             if theme_script.exists():
                 theme_script.unlink()
-                print(f"✓ Removed theme script")
+                print(f"[+] Removed theme script")
             
             # Reset registry settings
             self.reset_registry()
             
-            print(f"✓ {self.name} uninstalled successfully!")
+            print(f"[+] {self.name} uninstalled successfully!")
             return True
         except Exception as e:
-            print(f"✗ Error uninstalling: {e}")
+            print(f"[-] Error uninstalling: {e}")
             return False
     
     def reset_registry(self) -> bool:
@@ -627,10 +627,10 @@ if (Test-Path "C:\\Program Files\\7TSP\\7tsp_gui.exe") {
                 except:
                     pass
             
-            print(f"✓ Registry settings reset")
+            print(f"[+] Registry settings reset")
             return True
         except Exception as e:
-            print(f"✗ Error resetting registry: {e}")
+            print(f"[-] Error resetting registry: {e}")
             return False
     
     def get_status(self) -> Dict[str, Any]:

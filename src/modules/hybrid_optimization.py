@@ -168,12 +168,12 @@ class HybridOptimizationModule:
                     text=True
                 )
                 if result.returncode == 0:
-                    print(f"✓ Installed: {cmd}")
+                    print(f"[+] Installed: {cmd}")
                     success_count += 1
                 else:
-                    print(f"✗ Failed to install: {cmd}")
+                    print(f"[-] Failed to install: {cmd}")
             except Exception as e:
-                print(f"✗ Error installing dependency: {e}")
+                print(f"[-] Error installing dependency: {e}")
         
         return success_count == len(winget_commands)
     
@@ -212,11 +212,11 @@ class HybridOptimizationModule:
             else:
                 device_type = 'pc'
             
-            print(f"✓ Detected device type: {device_type}")
+            print(f"[+] Detected device type: {device_type}")
             return device_type
             
         except Exception as e:
-            print(f"⚠ Error detecting device type: {e}")
+            print(f"[!] Error detecting device type: {e}")
             return 'pc'  # Default to PC mode
     
     def apply_registry_tweaks(self) -> bool:
@@ -289,9 +289,9 @@ class HybridOptimizationModule:
                         winreg.SetValueEx(key, tweak['value'], 0, tweak['type'], tweak['data'])
                         applied += 1
             except Exception as e:
-                print(f"✗ Error applying registry tweak: {e}")
+                print(f"[-] Error applying registry tweak: {e}")
         
-        print(f"✓ Applied {applied} registry tweaks")
+        print(f"[+] Applied {applied} registry tweaks")
         return applied > 0
     
     def configure_mactype(self) -> bool:
@@ -338,10 +338,10 @@ class HybridOptimizationModule:
             with open(config_file, 'w') as f:
                 json.dump(mactype_config, f, indent=4)
             
-            print(f"✓ MacType configuration saved to {config_file}")
+            print(f"[+] MacType configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring MacType: {e}")
+            print(f"[-] Error configuring MacType: {e}")
             return False
     
     def create_mactype_profile(self) -> bool:
@@ -396,10 +396,10 @@ Segoe UI=0,1.0,1.2
             with open(profile_file, 'w') as f:
                 f.write(profile_content)
             
-            print(f"✓ MacType profile saved to {profile_file}")
+            print(f"[+] MacType profile saved to {profile_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating MacType profile: {e}")
+            print(f"[-] Error creating MacType profile: {e}")
             return False
     
     def configure_windhawk_hybrid(self) -> bool:
@@ -437,10 +437,10 @@ Segoe UI=0,1.0,1.2
             with open(config_file, 'w') as f:
                 json.dump(windhawk_config, f, indent=4)
             
-            print(f"✓ Windhawk hybrid configuration saved to {config_file}")
+            print(f"[+] Windhawk hybrid configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring Windhawk hybrid: {e}")
+            print(f"[-] Error configuring Windhawk hybrid: {e}")
             return False
     
     def create_hybrid_script(self) -> bool:
@@ -593,10 +593,10 @@ function Apply-HybridOptimizations {{
             with open(script_file, 'w') as f:
                 f.write(script_content)
             
-            print(f"✓ Hybrid script created: {script_file}")
+            print(f"[+] Hybrid script created: {script_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating hybrid script: {e}")
+            print(f"[-] Error creating hybrid script: {e}")
             return False
     
     def create_hybrid_config(self) -> bool:
@@ -624,10 +624,10 @@ function Apply-HybridOptimizations {{
             with open(config_file, 'w') as f:
                 json.dump(hybrid_config, f, indent=4)
             
-            print(f"✓ Hybrid configuration saved to {config_file}")
+            print(f"[+] Hybrid configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating hybrid configuration: {e}")
+            print(f"[-] Error creating hybrid configuration: {e}")
             return False
     
     def install(self) -> bool:
@@ -641,49 +641,49 @@ function Apply-HybridOptimizations {{
         
         # Step 1: Check dependencies
         if not self.check_dependencies():
-            print(f"⚠ Dependencies missing. Installing...")
+            print(f"[!] Dependencies missing. Installing...")
             if not self.install_dependencies():
-                print(f"✗ Failed to install dependencies")
+                print(f"[-] Failed to install dependencies")
                 success = False
         
         # Step 2: Detect device type
         device_type = self.detect_device_type()
-        print(f"✓ Detected device type: {device_type}")
+        print(f"[+] Detected device type: {device_type}")
         
         # Step 3: Apply registry tweaks
         if not self.apply_registry_tweaks():
-            print(f"✗ Failed to apply registry tweaks")
+            print(f"[-] Failed to apply registry tweaks")
             success = False
         
         # Step 4: Configure MacType
         if not self.configure_mactype():
-            print(f"✗ Failed to configure MacType")
+            print(f"[-] Failed to configure MacType")
             success = False
         
         # Step 5: Create MacType profile
         if not self.create_mactype_profile():
-            print(f"✗ Failed to create MacType profile")
+            print(f"[-] Failed to create MacType profile")
             success = False
         
         # Step 6: Configure Windhawk
         if not self.configure_windhawk_hybrid():
-            print(f"✗ Failed to configure Windhawk")
+            print(f"[-] Failed to configure Windhawk")
             success = False
         
         # Step 7: Create configuration script
         if not self.create_hybrid_script():
-            print(f"✗ Failed to create configuration script")
+            print(f"[-] Failed to create configuration script")
             success = False
         
         # Step 8: Create hybrid configuration
         if not self.create_hybrid_config():
-            print(f"✗ Failed to create hybrid configuration")
+            print(f"[-] Failed to create hybrid configuration")
             success = False
         
         if success:
-            print(f"\n✓ {self.name} installed successfully!")
+            print(f"\n[+] {self.name} installed successfully!")
         else:
-            print(f"\n✗ {self.name} installation completed with errors")
+            print(f"\n[-] {self.name} installation completed with errors")
         
         return success
     
@@ -696,40 +696,40 @@ function Apply-HybridOptimizations {{
             mactype_config = Path.home() / 'AppData' / 'Local' / 'MacType' / 'config.json'
             if mactype_config.exists():
                 mactype_config.unlink()
-                print(f"✓ Removed MacType configuration")
+                print(f"[+] Removed MacType configuration")
             
             # Remove MacType profile
             profile_file = Path.home() / 'AppData' / 'Local' / 'MacType' / 'Profiles' / 'Windows12_Hybrid.ini'
             if profile_file.exists():
                 profile_file.unlink()
-                print(f"✓ Removed MacType profile")
+                print(f"[+] Removed MacType profile")
             
             # Remove Windhawk configuration
             windhawk_config = Path.home() / '.windhawk' / 'hybrid_optimization.json'
             if windhawk_config.exists():
                 windhawk_config.unlink()
-                print(f"✓ Removed Windhawk hybrid configuration")
+                print(f"[+] Removed Windhawk hybrid configuration")
             
             # Remove hybrid configuration
             hybrid_config = Path(__file__).parent.parent.parent.parent / 'config' / 'Windows12' / 'hybrid_optimization_config.json'
             if hybrid_config.exists():
                 hybrid_config.unlink()
-                print(f"✓ Removed hybrid configuration")
+                print(f"[+] Removed hybrid configuration")
             
             # Remove hybrid script
             scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
             hybrid_script = scripts_dir / 'configure_hybrid.ps1'
             if hybrid_script.exists():
                 hybrid_script.unlink()
-                print(f"✓ Removed hybrid script")
+                print(f"[+] Removed hybrid script")
             
             # Reset registry settings
             self.reset_registry()
             
-            print(f"✓ {self.name} uninstalled successfully!")
+            print(f"[+] {self.name} uninstalled successfully!")
             return True
         except Exception as e:
-            print(f"✗ Error uninstalling: {e}")
+            print(f"[-] Error uninstalling: {e}")
             return False
     
     def reset_registry(self) -> bool:
@@ -779,10 +779,10 @@ function Apply-HybridOptimizations {{
                 except:
                     pass
             
-            print(f"✓ Registry settings reset")
+            print(f"[+] Registry settings reset")
             return True
         except Exception as e:
-            print(f"✗ Error resetting registry: {e}")
+            print(f"[-] Error resetting registry: {e}")
             return False
     
     def get_status(self) -> Dict[str, Any]:

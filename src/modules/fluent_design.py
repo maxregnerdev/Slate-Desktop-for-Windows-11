@@ -146,12 +146,12 @@ class FluentDesign3Module:
                     text=True
                 )
                 if result.returncode == 0:
-                    print(f"✓ Installed: {cmd}")
+                    print(f"[+] Installed: {cmd}")
                     success_count += 1
                 else:
-                    print(f"✗ Failed to install: {cmd}")
+                    print(f"[-] Failed to install: {cmd}")
             except Exception as e:
-                print(f"✗ Error installing dependency: {e}")
+                print(f"[-] Error installing dependency: {e}")
         
         return success_count == len(winget_commands)
     
@@ -233,9 +233,9 @@ class FluentDesign3Module:
                         winreg.SetValueEx(key, tweak['value'], 0, tweak['type'], tweak['data'])
                         applied += 1
             except Exception as e:
-                print(f"✗ Error applying registry tweak: {e}")
+                print(f"[-] Error applying registry tweak: {e}")
         
-        print(f"✓ Applied {applied} registry tweaks")
+        print(f"[+] Applied {applied} registry tweaks")
         return applied > 0
     
     def hex_to_dword(self, hex_color: str) -> int:
@@ -282,10 +282,10 @@ class FluentDesign3Module:
             with open(config_file, 'w') as f:
                 json.dump(ebm_config, f, indent=4)
             
-            print(f"✓ ExplorerBlurMica configuration saved to {config_file}")
+            print(f"[+] ExplorerBlurMica configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring ExplorerBlurMica: {e}")
+            print(f"[-] Error configuring ExplorerBlurMica: {e}")
             return False
     
     def configure_dwmblurglass(self) -> bool:
@@ -313,10 +313,10 @@ class FluentDesign3Module:
             with open(config_file, 'w') as f:
                 json.dump(dwm_config, f, indent=4)
             
-            print(f"✓ DWMBlurGlass configuration saved to {config_file}")
+            print(f"[+] DWMBlurGlass configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring DWMBlurGlass: {e}")
+            print(f"[-] Error configuring DWMBlurGlass: {e}")
             return False
     
     def configure_micaforeveryone(self) -> bool:
@@ -346,10 +346,10 @@ class FluentDesign3Module:
             with open(config_file, 'w') as f:
                 json.dump(mfe_config, f, indent=4)
             
-            print(f"✓ MicaForEveryone configuration saved to {config_file}")
+            print(f"[+] MicaForEveryone configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring MicaForEveryone: {e}")
+            print(f"[-] Error configuring MicaForEveryone: {e}")
             return False
     
     def create_design_config(self) -> bool:
@@ -409,10 +409,10 @@ class FluentDesign3Module:
             with open(config_file, 'w') as f:
                 json.dump(design_config, f, indent=4)
             
-            print(f"✓ Design configuration saved to {config_file}")
+            print(f"[+] Design configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating design configuration: {e}")
+            print(f"[-] Error creating design configuration: {e}")
             return False
     
     def create_design_script(self) -> bool:
@@ -496,10 +496,10 @@ Write-Host "Windows 12 Fluent Design 3.0 configuration applied!" -ForegroundColo
             with open(script_file, 'w') as f:
                 f.write(script_content)
             
-            print(f"✓ Design script created: {script_file}")
+            print(f"[+] Design script created: {script_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating design script: {e}")
+            print(f"[-] Error creating design script: {e}")
             return False
     
     def install(self) -> bool:
@@ -513,45 +513,45 @@ Write-Host "Windows 12 Fluent Design 3.0 configuration applied!" -ForegroundColo
         
         # Step 1: Check dependencies
         if not self.check_dependencies():
-            print(f"⚠ Dependencies missing. Installing...")
+            print(f"[!] Dependencies missing. Installing...")
             if not self.install_dependencies():
-                print(f"✗ Failed to install dependencies")
+                print(f"[-] Failed to install dependencies")
                 success = False
         
         # Step 2: Apply registry tweaks
         if not self.apply_registry_tweaks():
-            print(f"✗ Failed to apply registry tweaks")
+            print(f"[-] Failed to apply registry tweaks")
             success = False
         
         # Step 3: Configure ExplorerBlurMica
         if not self.configure_explorerblurmica():
-            print(f"✗ Failed to configure ExplorerBlurMica")
+            print(f"[-] Failed to configure ExplorerBlurMica")
             success = False
         
         # Step 4: Configure DWMBlurGlass
         if not self.configure_dwmblurglass():
-            print(f"✗ Failed to configure DWMBlurGlass")
+            print(f"[-] Failed to configure DWMBlurGlass")
             success = False
         
         # Step 5: Configure MicaForEveryone
         if not self.configure_micaforeveryone():
-            print(f"✗ Failed to configure MicaForEveryone")
+            print(f"[-] Failed to configure MicaForEveryone")
             success = False
         
         # Step 6: Create design configuration
         if not self.create_design_config():
-            print(f"✗ Failed to create design configuration")
+            print(f"[-] Failed to create design configuration")
             success = False
         
         # Step 7: Create configuration script
         if not self.create_design_script():
-            print(f"✗ Failed to create configuration script")
+            print(f"[-] Failed to create configuration script")
             success = False
         
         if success:
-            print(f"\n✓ {self.name} installed successfully!")
+            print(f"\n[+] {self.name} installed successfully!")
         else:
-            print(f"\n✗ {self.name} installation completed with errors")
+            print(f"\n[-] {self.name} installation completed with errors")
         
         return success
     
@@ -564,40 +564,40 @@ Write-Host "Windows 12 Fluent Design 3.0 configuration applied!" -ForegroundColo
             ebm_config = Path.home() / 'AppData' / 'Local' / 'ExplorerBlurMica' / 'config.json'
             if ebm_config.exists():
                 ebm_config.unlink()
-                print(f"✓ Removed ExplorerBlurMica configuration")
+                print(f"[+] Removed ExplorerBlurMica configuration")
             
             # Remove DWMBlurGlass configuration
             dwm_config = Path.home() / 'AppData' / 'Local' / 'DWMBlurGlass' / 'config.json'
             if dwm_config.exists():
                 dwm_config.unlink()
-                print(f"✓ Removed DWMBlurGlass configuration")
+                print(f"[+] Removed DWMBlurGlass configuration")
             
             # Remove MicaForEveryone configuration
             mfe_config = Path.home() / 'AppData' / 'Local' / 'MicaForEveryone' / 'config.json'
             if mfe_config.exists():
                 mfe_config.unlink()
-                print(f"✓ Removed MicaForEveryone configuration")
+                print(f"[+] Removed MicaForEveryone configuration")
             
             # Remove design configuration
             design_config = Path(__file__).parent.parent.parent.parent / 'config' / 'Windows12' / 'fluent_design_config.json'
             if design_config.exists():
                 design_config.unlink()
-                print(f"✓ Removed design configuration")
+                print(f"[+] Removed design configuration")
             
             # Remove design script
             scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
             design_script = scripts_dir / 'configure_fluent_design.ps1'
             if design_script.exists():
                 design_script.unlink()
-                print(f"✓ Removed design script")
+                print(f"[+] Removed design script")
             
             # Reset registry settings
             self.reset_registry()
             
-            print(f"✓ {self.name} uninstalled successfully!")
+            print(f"[+] {self.name} uninstalled successfully!")
             return True
         except Exception as e:
-            print(f"✗ Error uninstalling: {e}")
+            print(f"[-] Error uninstalling: {e}")
             return False
     
     def reset_registry(self) -> bool:
@@ -656,10 +656,10 @@ Write-Host "Windows 12 Fluent Design 3.0 configuration applied!" -ForegroundColo
                 except:
                     pass
             
-            print(f"✓ Registry settings reset")
+            print(f"[+] Registry settings reset")
             return True
         except Exception as e:
-            print(f"✗ Error resetting registry: {e}")
+            print(f"[-] Error resetting registry: {e}")
             return False
     
     def get_status(self) -> Dict[str, Any]:

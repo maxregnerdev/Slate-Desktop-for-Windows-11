@@ -80,9 +80,9 @@ class Windows12UITransformer:
         if len(version_parts) >= 3:
             build_number = int(version_parts[2])
             if build_number >= 26100:  # 25H2 build range
-                console.print("[green]✓ Windows 11 25H2 or later detected - Compatible![/green]")
+                console.print("[green][+] Windows 11 25H2 or later detected - Compatible![/green]")
             else:
-                console.print("[yellow]⚠ Windows 11 25H2 recommended for full Windows 12 UI experience[/yellow]")
+                console.print("[yellow][!] Windows 11 25H2 recommended for full Windows 12 UI experience[/yellow]")
         
         # Check system resources
         memory = psutil.virtual_memory()
@@ -97,11 +97,11 @@ class Windows12UITransformer:
             try:
                 result = subprocess.run(['where', tool], capture_output=True, text=True)
                 if result.returncode == 0:
-                    console.print(f"[green]✓ {tool} available[/green]")
+                    console.print(f"[green][+] {tool} available[/green]")
                 else:
-                    console.print(f"[yellow]⚠ {tool} not found[/yellow]")
+                    console.print(f"[yellow][!] {tool} not found[/yellow]")
             except:
-                console.print(f"[yellow]⚠ {tool} not found[/yellow]")
+                console.print(f"[yellow][!] {tool} not found[/yellow]")
         
         console.print("")
         return True
@@ -158,13 +158,13 @@ class Windows12UITransformer:
                 with open(config_file, 'r', encoding='utf-8') as f:
                     config = json.load(f)
                     self.windows12_config.update(config)
-                    console.print("[green]✓ Loaded existing configuration[/green]")
+                    console.print("[green][+] Loaded existing configuration[/green]")
             except Exception as e:
-                console.print(f"[yellow]⚠ Error loading config: {e}[/yellow]")
+                console.print(f"[yellow][!] Error loading config: {e}[/yellow]")
         else:
             # Create default configuration
             self.save_configuration()
-            console.print("[green]✓ Created default configuration[/green]")
+            console.print("[green][+] Created default configuration[/green]")
     
     def save_configuration(self):
         """Save Windows 12 configuration"""
@@ -174,9 +174,9 @@ class Windows12UITransformer:
             self.config_dir.mkdir(parents=True, exist_ok=True)
             with open(config_file, 'w', encoding='utf-8') as f:
                 json.dump(self.windows12_config, f, indent=4, ensure_ascii=False)
-            console.print("[green]✓ Configuration saved[/green]")
+            console.print("[green][+] Configuration saved[/green]")
         except Exception as e:
-            console.print(f"[red]✗ Error saving config: {e}[/red]")
+            console.print(f"[red][-] Error saving config: {e}[/red]")
     
     def initialize_components(self):
         """Initialize all Windows 12 UI components"""
@@ -201,7 +201,7 @@ class Windows12UITransformer:
             'copilot_integration': copilot_integration.Copilot2IntegrationModule()
         }
         
-        console.print(f"[green]✓ Initialized {len(self.components)} Windows 12 UI components[/green]")
+        console.print(f"[green][+] Initialized {len(self.components)} Windows 12 UI components[/green]")
         
         # Display component list
         for name, component in self.components.items():
@@ -235,10 +235,10 @@ class Windows12UITransformer:
                 )
                 
                 if result.returncode == 0 and 'Enabled' in result.stdout:
-                    console.print(f"[green]✓ {description} - Enabled[/green]")
+                    console.print(f"[green][+] {description} - Enabled[/green]")
                     enabled_features.append(feature)
                 else:
-                    console.print(f"[yellow]⚠ {description} - Not Enabled[/yellow]")
+                    console.print(f"[yellow][!] {description} - Not Enabled[/yellow]")
                     # Try to enable
                     enable_result = subprocess.run(
                         ['powershell', '-Command', f'Enable-WindowsOptionalFeature -Online -FeatureName {feature} -NoRestart'],
@@ -246,12 +246,12 @@ class Windows12UITransformer:
                         text=True
                     )
                     if enable_result.returncode == 0:
-                        console.print(f"[green]✓ Enabled {description}[/green]")
+                        console.print(f"[green][+] Enabled {description}[/green]")
                         enabled_features.append(feature)
                     else:
-                        console.print(f"[red]✗ Failed to enable {description}[/red]")
+                        console.print(f"[red][-] Failed to enable {description}[/red]")
             except Exception as e:
-                console.print(f"[yellow]⚠ Error checking {description}: {e}[/yellow]")
+                console.print(f"[yellow][!] Error checking {description}: {e}[/yellow]")
         
         console.print("")
         return enabled_features
@@ -331,15 +331,15 @@ class Windows12UITransformer:
                         elif tweak['type'] == 'REG_SZ':
                             winreg.SetValueEx(key, tweak['value'], 0, winreg.REG_SZ, tweak['data'])
                         
-                        console.print(f"[green]✓ Applied: {tweak['name']}[/green]")
+                        console.print(f"[green][+] Applied: {tweak['name']}[/green]")
                         applied_tweaks += 1
                 else:
-                    console.print(f"[yellow]⚠ Unsupported registry key: {base_key}[/yellow]")
+                    console.print(f"[yellow][!] Unsupported registry key: {base_key}[/yellow]")
                     
             except Exception as e:
-                console.print(f"[red]✗ Error applying {tweak['name']}: {e}[/red]")
+                console.print(f"[red][-] Error applying {tweak['name']}: {e}[/red]")
         
-        console.print(f"\n[green]✓ Applied {applied_tweaks} registry tweaks[/green]")
+        console.print(f"\n[green][+] Applied {applied_tweaks} registry tweaks[/green]")
         console.print("")
         
         return applied_tweaks
@@ -368,13 +368,13 @@ class Windows12UITransformer:
                         result = component.install()
                         if result:
                             self.installed_components.append(name)
-                            progress.update(task, description=f"[green]✓ {component.get_name()}[/green]")
+                            progress.update(task, description=f"[green][+] {component.get_name()}[/green]")
                         else:
-                            progress.update(task, description=f"[yellow]⚠ {component.get_name()}[/yellow]")
+                            progress.update(task, description=f"[yellow][!] {component.get_name()}[/yellow]")
                     except Exception as e:
-                        progress.update(task, description=f"[red]✗ {component.get_name()}: {e}[/red]")
+                        progress.update(task, description=f"[red][-] {component.get_name()}: {e}[/red]")
         
-        console.print(f"\n[green]✓ Installed {len(self.installed_components)} components[/green]")
+        console.print(f"\n[green][+] Installed {len(self.installed_components)} components[/green]")
         console.print("")
     
     def configure_system(self):
@@ -454,9 +454,9 @@ class Windows12UITransformer:
                 config['path'].parent.mkdir(parents=True, exist_ok=True)
                 with open(config['path'], 'w', encoding='utf-8') as f:
                     json.dump(config['content'], f, indent=4, ensure_ascii=False)
-                console.print(f"[green]✓ Created: {config['path'].name}[/green]")
+                console.print(f"[green][+] Created: {config['path'].name}[/green]")
             except Exception as e:
-                console.print(f"[red]✗ Error creating {config['path'].name}: {e}[/red]")
+                console.print(f"[red][-] Error creating {config['path'].name}: {e}[/red]")
         
         console.print("")
     
@@ -633,9 +633,9 @@ class Windows12UITransformer:
             sources_file = self.sources_dir / "sources.json"
             with open(sources_file, 'w', encoding='utf-8') as f:
                 json.dump(windows12_sources, f, indent=4, ensure_ascii=False)
-            console.print(f"[green]✓ Generated sources.json with {len(windows12_sources['files'])} Windows 12 components[/green]")
+            console.print(f"[green][+] Generated sources.json with {len(windows12_sources['files'])} Windows 12 components[/green]")
         except Exception as e:
-            console.print(f"[red]✗ Error generating sources.json: {e}[/red]")
+            console.print(f"[red][-] Error generating sources.json: {e}[/red]")
         
         console.print("")
     
@@ -791,9 +791,9 @@ This Windows 12 UI transformation is made possible by:
             guide_file = self.sources_dir / "INSTALLATION.md"
             with open(guide_file, 'w', encoding='utf-8') as f:
                 f.write(installation_guide)
-            console.print(f"[green]✓ Generated comprehensive installation guide[/green]")
+            console.print(f"[green][+] Generated comprehensive installation guide[/green]")
         except Exception as e:
-            console.print(f"[red]✗ Error generating installation guide: {e}[/red]")
+            console.print(f"[red][-] Error generating installation guide: {e}[/red]")
         
         console.print("")
     
@@ -821,9 +821,9 @@ This Windows 12 UI transformation is made possible by:
             summary_file = self.config_dir / "installation_summary.json"
             with open(summary_file, 'w', encoding='utf-8') as f:
                 json.dump(summary, f, indent=4, ensure_ascii=False)
-            console.print(f"[green]✓ Installation summary saved[/green]")
+            console.print(f"[green][+] Installation summary saved[/green]")
         except Exception as e:
-            console.print(f"[red]✗ Error saving installation summary: {e}[/red]")
+            console.print(f"[red][-] Error saving installation summary: {e}[/red]")
         
         # Display completion message
         console.print(Panel(
@@ -860,7 +860,7 @@ This Windows 12 UI transformation is made possible by:
             
             # Check system requirements
             if not self.check_system_requirements():
-                console.print("[red]✗ System requirements not met. Exiting...[/red]")
+                console.print("[red][-] System requirements not met. Exiting...[/red]")
                 return False
             
             # Load configuration
@@ -896,10 +896,10 @@ This Windows 12 UI transformation is made possible by:
             return True
             
         except KeyboardInterrupt:
-            console.print("\n[yellow]⚠ Installation interrupted by user[/yellow]")
+            console.print("\n[yellow][!] Installation interrupted by user[/yellow]")
             return False
         except Exception as e:
-            console.print(f"[red]✗ Error during installation: {e}[/red]")
+            console.print(f"[red][-] Error during installation: {e}[/red]")
             return False
 
 
@@ -909,9 +909,9 @@ def main():
     success = transformer.run()
     
     if success:
-        console.print("[green]✓ Windows 12 UI Transformation completed successfully![/green]")
+        console.print("[green][+] Windows 12 UI Transformation completed successfully![/green]")
     else:
-        console.print("[red]✗ Windows 12 UI Transformation failed[/red]")
+        console.print("[red][-] Windows 12 UI Transformation failed[/red]")
     
     return 0 if success else 1
 

@@ -150,12 +150,12 @@ class TopWidgetsModule:
                     text=True
                 )
                 if result.returncode == 0:
-                    print(f"✓ Installed: {cmd}")
+                    print(f"[+] Installed: {cmd}")
                     success_count += 1
                 else:
-                    print(f"✗ Failed to install: {cmd}")
+                    print(f"[-] Failed to install: {cmd}")
             except Exception as e:
-                print(f"✗ Error installing dependency: {e}")
+                print(f"[-] Error installing dependency: {e}")
         
         return success_count == len(winget_commands)
     
@@ -201,9 +201,9 @@ class TopWidgetsModule:
                         winreg.SetValueEx(key, tweak['value'], 0, tweak['type'], tweak['data'])
                         applied += 1
             except Exception as e:
-                print(f"✗ Error applying registry tweak: {e}")
+                print(f"[-] Error applying registry tweak: {e}")
         
-        print(f"✓ Applied {applied} registry tweaks")
+        print(f"[+] Applied {applied} registry tweaks")
         return applied > 0
     
     def configure_windhawk_widgets(self) -> bool:
@@ -244,10 +244,10 @@ class TopWidgetsModule:
             with open(config_file, 'w') as f:
                 json.dump(windhawk_config, f, indent=4)
             
-            print(f"✓ Windhawk widgets configuration saved to {config_file}")
+            print(f"[+] Windhawk widgets configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring Windhawk widgets: {e}")
+            print(f"[-] Error configuring Windhawk widgets: {e}")
             return False
     
     def create_rainmeter_widgets(self) -> bool:
@@ -284,9 +284,9 @@ class TopWidgetsModule:
                 (widget_dir / f"{widget['name']}.ini").write_text(widget['content'])
                 created += 1
             except Exception as e:
-                print(f"✗ Error creating {widget['name']}: {e}")
+                print(f"[-] Error creating {widget['name']}: {e}")
         
-        print(f"✓ Created {created} Rainmeter widget skins")
+        print(f"[+] Created {created} Rainmeter widget skins")
         return created > 0
     
     def create_copilot_skin(self) -> str:
@@ -561,10 +561,10 @@ State=Hide
             with open(config_file, 'w') as f:
                 json.dump(rainmeter_config, f, indent=4)
             
-            print(f"✓ Rainmeter configuration saved to {config_file}")
+            print(f"[+] Rainmeter configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring Rainmeter: {e}")
+            print(f"[-] Error configuring Rainmeter: {e}")
             return False
     
     def create_widget_script(self) -> bool:
@@ -615,10 +615,10 @@ Write-Host "Windows 12 Top Widgets configuration applied!" -ForegroundColor Gree
             with open(script_file, 'w') as f:
                 f.write(script_content)
             
-            print(f"✓ Widget script created: {script_file}")
+            print(f"[+] Widget script created: {script_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating widget script: {e}")
+            print(f"[-] Error creating widget script: {e}")
             return False
     
     def install(self) -> bool:
@@ -632,40 +632,40 @@ Write-Host "Windows 12 Top Widgets configuration applied!" -ForegroundColor Gree
         
         # Step 1: Check dependencies
         if not self.check_dependencies():
-            print(f"⚠ Dependencies missing. Installing...")
+            print(f"[!] Dependencies missing. Installing...")
             if not self.install_dependencies():
-                print(f"✗ Failed to install dependencies")
+                print(f"[-] Failed to install dependencies")
                 success = False
         
         # Step 2: Apply registry tweaks
         if not self.apply_registry_tweaks():
-            print(f"✗ Failed to apply registry tweaks")
+            print(f"[-] Failed to apply registry tweaks")
             success = False
         
         # Step 3: Configure Windhawk
         if not self.configure_windhawk_widgets():
-            print(f"✗ Failed to configure Windhawk")
+            print(f"[-] Failed to configure Windhawk")
             success = False
         
         # Step 4: Create Rainmeter widgets
         if not self.create_rainmeter_widgets():
-            print(f"✗ Failed to create Rainmeter widgets")
+            print(f"[-] Failed to create Rainmeter widgets")
             success = False
         
         # Step 5: Configure Rainmeter
         if not self.configure_rainmeter():
-            print(f"✗ Failed to configure Rainmeter")
+            print(f"[-] Failed to configure Rainmeter")
             success = False
         
         # Step 6: Create configuration script
         if not self.create_widget_script():
-            print(f"✗ Failed to create configuration script")
+            print(f"[-] Failed to create configuration script")
             success = False
         
         if success:
-            print(f"\n✓ {self.name} installed successfully!")
+            print(f"\n[+] {self.name} installed successfully!")
         else:
-            print(f"\n✗ {self.name} installation completed with errors")
+            print(f"\n[-] {self.name} installation completed with errors")
         
         return success
     
@@ -678,28 +678,28 @@ Write-Host "Windows 12 Top Widgets configuration applied!" -ForegroundColor Gree
             config_file = Path.home() / '.windhawk' / 'top_widgets.json'
             if config_file.exists():
                 config_file.unlink()
-                print(f"✓ Removed Windhawk widgets configuration")
+                print(f"[+] Removed Windhawk widgets configuration")
             
             # Remove Rainmeter skins
             rainmeter_skins = Path.home() / 'Documents' / 'Rainmeter' / 'Skins' / 'Windows12Widgets'
             if rainmeter_skins.exists():
                 import shutil
                 shutil.rmtree(rainmeter_skins)
-                print(f"✓ Removed Rainmeter widgets")
+                print(f"[+] Removed Rainmeter widgets")
             
             # Remove Rainmeter configuration
             rm_config = Path.home() / 'Documents' / 'Rainmeter' / 'Windows12Widgets.json'
             if rm_config.exists():
                 rm_config.unlink()
-                print(f"✓ Removed Rainmeter configuration")
+                print(f"[+] Removed Rainmeter configuration")
             
             # Reset registry settings
             self.reset_registry()
             
-            print(f"✓ {self.name} uninstalled successfully!")
+            print(f"[+] {self.name} uninstalled successfully!")
             return True
         except Exception as e:
-            print(f"✗ Error uninstalling: {e}")
+            print(f"[-] Error uninstalling: {e}")
             return False
     
     def reset_registry(self) -> bool:
@@ -728,10 +728,10 @@ Write-Host "Windows 12 Top Widgets configuration applied!" -ForegroundColor Gree
                 except:
                     pass
             
-            print(f"✓ Registry settings reset")
+            print(f"[+] Registry settings reset")
             return True
         except Exception as e:
-            print(f"✗ Error resetting registry: {e}")
+            print(f"[-] Error resetting registry: {e}")
             return False
     
     def get_status(self) -> Dict[str, Any]:

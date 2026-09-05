@@ -211,9 +211,9 @@ class ModularDesignModule:
                         winreg.SetValueEx(key, tweak['value'], 0, tweak['type'], tweak['data'])
                         applied += 1
             except Exception as e:
-                print(f"✗ Error applying registry tweak: {e}")
+                print(f"[-] Error applying registry tweak: {e}")
         
-        print(f"✓ Applied {applied} registry tweaks")
+        print(f"[+] Applied {applied} registry tweaks")
         return applied > 0
     
     def create_module_manifest(self) -> bool:
@@ -270,10 +270,10 @@ class ModularDesignModule:
             with open(manifest_file, 'w') as f:
                 json.dump(manifest, f, indent=4)
             
-            print(f"✓ Module manifest saved to {manifest_file}")
+            print(f"[+] Module manifest saved to {manifest_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating module manifest: {e}")
+            print(f"[-] Error creating module manifest: {e}")
             return False
     
     def create_component_loader_script(self) -> bool:
@@ -440,10 +440,10 @@ if __name__ == "__main__":
             with open(loader_file, 'w') as f:
                 f.write(loader_script)
             
-            print(f"✓ Component loader script created: {loader_file}")
+            print(f"[+] Component loader script created: {loader_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating component loader script: {e}")
+            print(f"[-] Error creating component loader script: {e}")
             return False
     
     def create_modular_config(self) -> bool:
@@ -482,10 +482,10 @@ if __name__ == "__main__":
             with open(config_file, 'w') as f:
                 json.dump(modular_config, f, indent=4)
             
-            print(f"✓ Modular configuration saved to {config_file}")
+            print(f"[+] Modular configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating modular configuration: {e}")
+            print(f"[-] Error creating modular configuration: {e}")
             return False
     
     def create_modular_script(self) -> bool:
@@ -591,10 +591,10 @@ Write-Host "Windows 12 Modular Design System operation completed!" -ForegroundCo
             with open(script_file, 'w') as f:
                 f.write(script_content)
             
-            print(f"✓ Modular script created: {script_file}")
+            print(f"[+] Modular script created: {script_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating modular script: {e}")
+            print(f"[-] Error creating modular script: {e}")
             return False
     
     def install(self) -> bool:
@@ -608,33 +608,33 @@ Write-Host "Windows 12 Modular Design System operation completed!" -ForegroundCo
         
         # Step 1: Apply registry tweaks
         if not self.apply_registry_tweaks():
-            print(f"✗ Failed to apply registry tweaks")
+            print(f"[-] Failed to apply registry tweaks")
             success = False
         
         # Step 2: Create module manifest
         if not self.create_module_manifest():
-            print(f"✗ Failed to create module manifest")
+            print(f"[-] Failed to create module manifest")
             success = False
         
         # Step 3: Create component loader script
         if not self.create_component_loader_script():
-            print(f"✗ Failed to create component loader script")
+            print(f"[-] Failed to create component loader script")
             success = False
         
         # Step 4: Create modular configuration
         if not self.create_modular_config():
-            print(f"✗ Failed to create modular configuration")
+            print(f"[-] Failed to create modular configuration")
             success = False
         
         # Step 5: Create modular script
         if not self.create_modular_script():
-            print(f"✗ Failed to create modular script")
+            print(f"[-] Failed to create modular script")
             success = False
         
         if success:
-            print(f"\n✓ {self.name} installed successfully!")
+            print(f"\n[+] {self.name} installed successfully!")
         else:
-            print(f"\n✗ {self.name} installation completed with errors")
+            print(f"\n[-] {self.name} installation completed with errors")
         
         return success
     
@@ -647,33 +647,33 @@ Write-Host "Windows 12 Modular Design System operation completed!" -ForegroundCo
             manifest_file = Path(__file__).parent.parent.parent.parent / 'config' / 'Windows12' / 'modular_design_manifest.json'
             if manifest_file.exists():
                 manifest_file.unlink()
-                print(f"✓ Removed module manifest")
+                print(f"[+] Removed module manifest")
             
             # Remove modular configuration
             config_file = Path(__file__).parent.parent.parent.parent / 'config' / 'Windows12' / 'modular_config.json'
             if config_file.exists():
                 config_file.unlink()
-                print(f"✓ Removed modular configuration")
+                print(f"[+] Removed modular configuration")
             
             # Remove component loader script
             loader_file = Path(__file__).parent.parent.parent / 'src' / 'scripts' / 'component_loader.py'
             if loader_file.exists():
                 loader_file.unlink()
-                print(f"✓ Removed component loader script")
+                print(f"[+] Removed component loader script")
             
             # Remove modular script
             script_file = Path(__file__).parent.parent.parent / 'src' / 'scripts' / 'configure_modular.ps1'
             if script_file.exists():
                 script_file.unlink()
-                print(f"✓ Removed modular script")
+                print(f"[+] Removed modular script")
             
             # Reset registry settings
             self.reset_registry()
             
-            print(f"✓ {self.name} uninstalled successfully!")
+            print(f"[+] {self.name} uninstalled successfully!")
             return True
         except Exception as e:
-            print(f"✗ Error uninstalling: {e}")
+            print(f"[-] Error uninstalling: {e}")
             return False
     
     def reset_registry(self) -> bool:
@@ -698,10 +698,10 @@ Write-Host "Windows 12 Modular Design System operation completed!" -ForegroundCo
                 except:
                     pass
             
-            print(f"✓ Registry settings reset")
+            print(f"[+] Registry settings reset")
             return True
         except Exception as e:
-            print(f"✗ Error resetting registry: {e}")
+            print(f"[-] Error resetting registry: {e}")
             return False
     
     def get_status(self) -> Dict[str, Any]:

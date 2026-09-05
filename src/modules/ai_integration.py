@@ -176,12 +176,12 @@ class AIIntegrationModule:
                     text=True
                 )
                 if result.returncode == 0:
-                    print(f"✓ Installed: {cmd}")
+                    print(f"[+] Installed: {cmd}")
                     success_count += 1
                 else:
-                    print(f"✗ Failed to install: {cmd}")
+                    print(f"[-] Failed to install: {cmd}")
             except Exception as e:
-                print(f"✗ Error installing dependency: {e}")
+                print(f"[-] Error installing dependency: {e}")
         
         return success_count == len(winget_commands)
     
@@ -245,9 +245,9 @@ class AIIntegrationModule:
                         winreg.SetValueEx(key, tweak['value'], 0, tweak['type'], tweak['data'])
                         applied += 1
             except Exception as e:
-                print(f"✗ Error applying registry tweak: {e}")
+                print(f"[-] Error applying registry tweak: {e}")
         
-        print(f"✓ Applied {applied} registry tweaks")
+        print(f"[+] Applied {applied} registry tweaks")
         return applied > 0
     
     def configure_copilot(self) -> bool:
@@ -282,10 +282,10 @@ class AIIntegrationModule:
             with open(config_file, 'w') as f:
                 json.dump(copilot_config, f, indent=4)
             
-            print(f"✓ Copilot 2.0 configuration saved to {config_file}")
+            print(f"[+] Copilot 2.0 configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring Copilot 2.0: {e}")
+            print(f"[-] Error configuring Copilot 2.0: {e}")
             return False
     
     def configure_powertoys_ai(self) -> bool:
@@ -332,10 +332,10 @@ class AIIntegrationModule:
             with open(config_file, 'w') as f:
                 json.dump(pt_config, f, indent=4)
             
-            print(f"✓ PowerToys AI configuration saved to {config_file}")
+            print(f"[+] PowerToys AI configuration saved to {config_file}")
             return True
         except Exception as e:
-            print(f"✗ Error configuring PowerToys AI: {e}")
+            print(f"[-] Error configuring PowerToys AI: {e}")
             return False
     
     def create_ai_scripts(self) -> bool:
@@ -367,11 +367,11 @@ class AIIntegrationModule:
                 with open(script_file, 'w') as f:
                     f.write(script['content'])
                 created += 1
-                print(f"✓ Created script: {script_file}")
+                print(f"[+] Created script: {script_file}")
             
             return created > 0
         except Exception as e:
-            print(f"✗ Error creating AI scripts: {e}")
+            print(f"[-] Error creating AI scripts: {e}")
             return False
     
     def create_copilot_script(self) -> str:
@@ -560,35 +560,35 @@ Windows Registry Editor Version 5.00
         
         # Step 1: Check dependencies
         if not self.check_dependencies():
-            print(f"⚠ Dependencies missing. Installing...")
+            print(f"[!] Dependencies missing. Installing...")
             if not self.install_dependencies():
-                print(f"✗ Failed to install dependencies")
+                print(f"[-] Failed to install dependencies")
                 success = False
         
         # Step 2: Apply registry tweaks
         if not self.apply_registry_tweaks():
-            print(f"✗ Failed to apply registry tweaks")
+            print(f"[-] Failed to apply registry tweaks")
             success = False
         
         # Step 3: Configure Copilot 2.0
         if not self.configure_copilot():
-            print(f"✗ Failed to configure Copilot 2.0")
+            print(f"[-] Failed to configure Copilot 2.0")
             success = False
         
         # Step 4: Configure PowerToys AI
         if not self.configure_powertoys_ai():
-            print(f"✗ Failed to configure PowerToys AI")
+            print(f"[-] Failed to configure PowerToys AI")
             success = False
         
         # Step 5: Create AI scripts
         if not self.create_ai_scripts():
-            print(f"✗ Failed to create AI scripts")
+            print(f"[-] Failed to create AI scripts")
             success = False
         
         if success:
-            print(f"\n✓ {self.name} installed successfully!")
+            print(f"\n[+] {self.name} installed successfully!")
         else:
-            print(f"\n✗ {self.name} installation completed with errors")
+            print(f"\n[-] {self.name} installation completed with errors")
         
         return success
     
@@ -601,13 +601,13 @@ Windows Registry Editor Version 5.00
             copilot_config = Path.home() / 'AppData' / 'Local' / 'Microsoft' / 'Copilot' / 'config.json'
             if copilot_config.exists():
                 copilot_config.unlink()
-                print(f"✓ Removed Copilot configuration")
+                print(f"[+] Removed Copilot configuration")
             
             # Remove PowerToys AI configuration
             pt_config = Path.home() / 'AppData' / 'Local' / 'Microsoft' / 'PowerToys' / 'ai_config.json'
             if pt_config.exists():
                 pt_config.unlink()
-                print(f"✓ Removed PowerToys AI configuration")
+                print(f"[+] Removed PowerToys AI configuration")
             
             # Remove AI scripts
             scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
@@ -615,15 +615,15 @@ Windows Registry Editor Version 5.00
                 script_file = scripts_dir / script_name
                 if script_file.exists():
                     script_file.unlink()
-                    print(f"✓ Removed script: {script_name}")
+                    print(f"[+] Removed script: {script_name}")
             
             # Reset registry settings
             self.reset_registry()
             
-            print(f"✓ {self.name} uninstalled successfully!")
+            print(f"[+] {self.name} uninstalled successfully!")
             return True
         except Exception as e:
-            print(f"✗ Error uninstalling: {e}")
+            print(f"[-] Error uninstalling: {e}")
             return False
     
     def reset_registry(self) -> bool:
@@ -662,10 +662,10 @@ Windows Registry Editor Version 5.00
             except:
                 pass
             
-            print(f"✓ Registry settings reset")
+            print(f"[+] Registry settings reset")
             return True
         except Exception as e:
-            print(f"✗ Error resetting registry: {e}")
+            print(f"[-] Error resetting registry: {e}")
             return False
     
     def get_status(self) -> Dict[str, Any]:
