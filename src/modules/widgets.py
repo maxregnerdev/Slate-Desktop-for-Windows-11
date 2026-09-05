@@ -608,9 +608,9 @@ Write-Host "Windows 12 Top Widgets configuration applied!" -ForegroundColor Gree
 '''
         
         try:
-            scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
+            scripts_dir = Path(__file__).parent.parent.parent / Path('src') / Path('scripts')
             scripts_dir.mkdir(parents=True, exist_ok=True)
-            script_file = scripts_dir / 'configure_top_widgets.ps1'
+            script_file = scripts_dir / Path('configure_top_widgets.ps1')
             
             with open(script_file, 'w') as f:
                 f.write(script_content)

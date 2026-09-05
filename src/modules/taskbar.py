@@ -283,9 +283,9 @@ Write-Host "Windows 12 Floating Taskbar configuration applied!" -ForegroundColor
 '''
         
         try:
-            scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
+            scripts_dir = Path(__file__).parent.parent.parent / Path('src') / Path('scripts')
             scripts_dir.mkdir(parents=True, exist_ok=True)
-            script_file = scripts_dir / 'configure_floating_taskbar.ps1'
+            script_file = scripts_dir / Path('configure_floating_taskbar.ps1')
             
             with open(script_file, 'w') as f:
                 f.write(script_content)

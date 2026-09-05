@@ -371,7 +371,7 @@ class Copilot2IntegrationModule:
         
         created = 0
         try:
-            scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
+            scripts_dir = Path(__file__).parent.parent.parent / r'src' / r'scripts'
             scripts_dir.mkdir(parents=True, exist_ok=True)
             
             for script in scripts:
@@ -710,7 +710,7 @@ Write-Host "Copilot 2.0 Service management completed!" -ForegroundColor Green
                 print(f"[+] Removed Copilot 2.0 configuration")
             
             # Remove Copilot scripts
-            scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
+            scripts_dir = Path(__file__).parent.parent.parent / r'src' / r'scripts'
             for script_name in ['enable_copilot_integration.ps1', 'configure_copilot_features.ps1', 'start_copilot_service.ps1']:
                 script_file = scripts_dir / script_name
                 if script_file.exists():

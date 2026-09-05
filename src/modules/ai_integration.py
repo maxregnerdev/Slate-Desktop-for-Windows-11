@@ -359,7 +359,7 @@ class AIIntegrationModule:
         
         created = 0
         try:
-            scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
+            scripts_dir = Path(__file__).parent.parent.parent / r'src' / r'scripts'
             scripts_dir.mkdir(parents=True, exist_ok=True)
             
             for script in scripts:
@@ -610,7 +610,7 @@ Windows Registry Editor Version 5.00
                 print(f"[+] Removed PowerToys AI configuration")
             
             # Remove AI scripts
-            scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
+            scripts_dir = Path(__file__).parent.parent.parent / r'src' / r'scripts'
             for script_name in ['enable_copilot.ps1', 'configure_ai_features.ps1', 'voice_control_setup.ps1']:
                 script_file = scripts_dir / script_name
                 if script_file.exists():
