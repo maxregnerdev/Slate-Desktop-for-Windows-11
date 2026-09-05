@@ -1,0 +1,24 @@
+{
+    "top_widgets": true,
+    "position": "top",
+    "widgets": [
+        {
+            "name": "Copilot",
+            "enabled": true,
+            "position": "left"
+        },
+        {
+            "name": "Search",
+            "enabled": true,
+            "position": "center"
+        },
+        {
+            "name": "Notifications",
+            "enabled": true,
+            "position": "right"
+        }
+    ],
+    "auto_hide": false,
+    "transparency": 0.9,
+    "rounded_corners": true
+}

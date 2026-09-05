@@ -1,0 +1,154 @@
+{
+    "files": [
+        {
+            "path": "https://github.com/ramensoftware/windhawk/releases/latest/download/windhawk_setup.exe",
+            "name": "Windhawk - Next Valley Edition",
+            "description": "Windows customization marketplace for floating taskbar and UI mods",
+            "extract": false,
+            "folder_main": "01 - Core Components",
+            "folder_name": "Step 1 - Windhawk Customization Engine",
+            "type": "url",
+            "windows12_feature": "floating_taskbar"
+        },
+        {
+            "path": "https://github.com/valinet/ExplorerPatcher/releases/latest/download/ep_setup.exe",
+            "name": "ExplorerPatcher - Next Valley Mod",
+            "description": "Modified ExplorerPatcher with floating taskbar support",
+            "extract": false,
+            "folder_main": "01 - Core Components",
+            "folder_name": "Step 2 - ExplorerPatcher Next Valley",
+            "type": "url",
+            "windows12_feature": "floating_taskbar"
+        },
+        {
+            "path": "https://github.com/Maplespe/ExplorerBlurMica/releases/latest/download/Release_x64.zip",
+            "name": "ExplorerBlurMica - Windows 12 Edition",
+            "description": "Enhanced blur and mica effects for Windows 12 UI",
+            "extract": true,
+            "folder_main": "02 - Visual Effects",
+            "folder_name": "Step 1 - ExplorerBlurMica Enhanced",
+            "type": "url",
+            "windows12_feature": "fluent_design"
+        },
+        {
+            "path": "https://github.com/Maplespe/DWMBlurGlass/releases/latest/download/Release_x64.zip",
+            "name": "DWMBlurGlass - Next Valley",
+            "description": "Custom DWM effects for Windows 12 rounded corners and transparency",
+            "extract": true,
+            "folder_main": "02 - Visual Effects",
+            "folder_name": "Step 2 - DWMBlurGlass Enhanced",
+            "type": "url",
+            "windows12_feature": "rounded_corners"
+        },
+        {
+            "path": "https://github.com/TranslucentTB/TranslucentTB/releases/latest/download/bundle.msixbundle",
+            "name": "TranslucentTB - Windows 12",
+            "description": "Transparent taskbar for Windows 12 floating effect",
+            "extract": false,
+            "folder_main": "02 - Visual Effects",
+            "folder_name": "Step 3 - TranslucentTB Enhanced",
+            "type": "url",
+            "windows12_feature": "floating_taskbar"
+        },
+        {
+            "path": "https://github.com/MicaForEveryone/MicaForEveryone/releases/latest/download/MicaForEveryone-x64-Release-Installer.exe",
+            "name": "MicaForEveryone - Windows 12",
+            "description": "Extended mica effects for all Win32 applications",
+            "extract": false,
+            "folder_main": "02 - Visual Effects",
+            "folder_name": "Step 4 - MicaForEveryone Enhanced",
+            "type": "url",
+            "windows12_feature": "fluent_design"
+        },
+        {
+            "path": "https://github.com/microsoft/PowerToys/releases/latest/download/PowerToysSetup-x64.exe",
+            "name": "PowerToys - Copilot 2.0",
+            "description": "PowerToys with Copilot 2.0 integration and AI features",
+            "extract": false,
+            "folder_main": "03 - AI Integration",
+            "folder_name": "Step 1 - PowerToys Copilot Edition",
+            "type": "url",
+            "windows12_feature": "ai_integration"
+        },
+        {
+            "path": "https://winget.run/pkg/Microsoft.Copilot",
+            "name": "Windows Copilot 2.0",
+            "description": "Microsoft Copilot 2.0 with Windows 12 integration",
+            "extract": false,
+            "folder_main": "03 - AI Integration",
+            "folder_name": "Step 2 - Copilot 2.0",
+            "type": "cmd",
+            "windows12_feature": "copilot_integration"
+        },
+        {
+            "path": "https://github.com/niivu/pi11z/releases/latest/download/pi11z-Windows12-Edition.zip",
+            "name": "pi11z - Windows 12 Theme",
+            "description": "Windows 12 inspired theme with floating taskbar support",
+            "extract": true,
+            "folder_main": "04 - Themes",
+            "folder_name": "Step 1 - Windows 12 Theme",
+            "type": "url",
+            "windows12_feature": "windows12_theme"
+        },
+        {
+            "path": "https://github.com/niivu/resource-redirect-icon-themes/releases/latest/download/Windows12-Icons.zip",
+            "name": "Windows 12 Icons",
+            "description": "Complete icon set for Windows 12 UI",
+            "extract": true,
+            "folder_main": "04 - Themes",
+            "folder_name": "Step 2 - Windows 12 Icons",
+            "type": "url",
+            "windows12_feature": "windows12_theme"
+        },
+        {
+            "path": "https://github.com/rainmeter/rainmeter/releases/latest/download/Rainmeter-Setup.exe",
+            "name": "Rainmeter - Windows 12 Widgets",
+            "description": "Rainmeter with Windows 12 top-mounted widgets",
+            "extract": false,
+            "folder_main": "05 - Widgets",
+            "folder_name": "Step 1 - Rainmeter Widget Engine",
+            "type": "url",
+            "windows12_feature": "top_widgets"
+        },
+        {
+            "path": "https://github.com/ramensoftware/windhawk-mods/releases/latest/download/Taskbar-Floating.zip",
+            "name": "Windhawk - Floating Taskbar Mod",
+            "description": "Floating taskbar mod for Windhawk",
+            "extract": true,
+            "folder_main": "05 - Widgets",
+            "folder_name": "Step 2 - Floating Taskbar Mod",
+            "type": "url",
+            "windows12_feature": "floating_taskbar"
+        },
+        {
+            "path": "https://github.com/ramensoftware/windhawk-mods/releases/latest/download/Top-Widgets.zip",
+            "name": "Windhawk - Top Widgets Mod",
+            "description": "Top-mounted widgets mod for Windows 12",
+            "extract": true,
+            "folder_main": "05 - Widgets",
+            "folder_name": "Step 3 - Top Widgets Mod",
+            "type": "url",
+            "windows12_feature": "top_widgets"
+        },
+        {
+            "path": "https://github.com/snowie2000/mactype/releases/latest/download/MacTypeInstaller.exe",
+            "name": "MacType - Windows 12 Edition",
+            "description": "Enhanced font rendering for Windows 12 UI",
+            "extract": false,
+            "folder_main": "06 - Hybrid Optimization",
+            "folder_name": "Step 1 - MacType Enhanced",
+            "type": "url",
+            "windows12_feature": "hybrid_optimization"
+        },
+        {
+            "path": "https://github.com/chawyehsu/mactype-profile/releases/latest/download/Windows12-Profile.ini",
+            "name": "MacType Windows 12 Profile",
+            "description": "Optimized MacType profile for Windows 12 UI",
+            "extract": false,
+            "folder_main": "06 - Hybrid Optimization",
+            "folder_name": "Step 2 - MacType Windows 12 Profile",
+            "type": "url",
+            "windows12_feature": "hybrid_optimization"
+        }
+    ]
+}

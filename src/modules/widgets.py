@@ -9,9 +9,52 @@ Implements the top-mounted widgets and notification system for Windows 12 UI.
 import json
 import subprocess
 import sys
+import platform
 from pathlib import Path
 from typing import Dict, Any, Optional
-import winreg
+
+# Import winreg only on Windows
+if platform.system() == 'Windows':
+    import winreg
+else:
+    # Create a mock winreg module for non-Windows platforms
+    import types
+    
+    class MockWinReg:
+        HKEY_CURRENT_USER = 'HKEY_CURRENT_USER'
+        HKEY_LOCAL_MACHINE = 'HKEY_LOCAL_MACHINE'
+        KEY_WRITE = 0
+        REG_DWORD = 0
+        REG_SZ = 0
+        
+        @staticmethod
+        def CreateKeyEx(*args, **kwargs):
+            class MockKey:
+                def __enter__(self):
+                    return self
+                def __exit__(self, *args):
+                    pass
+                def Close(self):
+                    pass
+            return MockKey()
+        
+        @staticmethod
+        def SetValueEx(*args, **kwargs):
+            pass
+        
+        @staticmethod
+        def OpenKey(*args, **kwargs):
+            class MockKey:
+                def __enter__(self):
+                    return self
+                def __exit__(self, *args):
+                    pass
+                def Close(self):
+                    pass
+            return MockKey()
+    
+    winreg = MockWinReg()
+    sys.modules['winreg'] = winreg
 
 
 class TopWidgetsModule:

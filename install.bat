@@ -19,7 +19,7 @@ if %errorLevel% neq 0 (
 cd /d "%~dp0"
 
 :: Display Windows 12 Transformation Header
-python src\main.py
+python -m src.main
 
 echo.
 echo ============================================================================

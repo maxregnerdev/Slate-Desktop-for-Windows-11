@@ -25,7 +25,49 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 import psutil
-import winreg
+
+# Import winreg only on Windows
+if platform.system() == 'Windows':
+    import winreg
+else:
+    # Create a mock winreg module for non-Windows platforms
+    import types
+    
+    class MockWinReg:
+        HKEY_CURRENT_USER = 'HKEY_CURRENT_USER'
+        HKEY_LOCAL_MACHINE = 'HKEY_LOCAL_MACHINE'
+        KEY_WRITE = 0
+        REG_DWORD = 0
+        REG_SZ = 0
+        
+        @staticmethod
+        def CreateKeyEx(*args, **kwargs):
+            class MockKey:
+                def __enter__(self):
+                    return self
+                def __exit__(self, *args):
+                    pass
+                def Close(self):
+                    pass
+            return MockKey()
+        
+        @staticmethod
+        def SetValueEx(*args, **kwargs):
+            pass
+        
+        @staticmethod
+        def OpenKey(*args, **kwargs):
+            class MockKey:
+                def __enter__(self):
+                    return self
+                def __exit__(self, *args):
+                    pass
+                def Close(self):
+                    pass
+            return MockKey()
+    
+    winreg = MockWinReg()
+    sys.modules['winreg'] = winreg
 
 # Initialize colorama
 init(autoreset=True)
@@ -147,7 +189,12 @@ class Windows12UITransformer:
         ))
         
         console.print("[dim]Press Enter to begin Windows 12 UI Transformation...[/dim]")
-        input()
+        try:
+            input()
+        except EOFError:
+            # Non-interactive mode, continue without waiting
+            console.print("[yellow][!] Running in non-interactive mode, continuing...[/yellow]")
+            pass
     
     def load_configuration(self):
         """Load Windows 12 configuration"""
@@ -227,29 +274,34 @@ class Windows12UITransformer:
         
         for feature, description in required_features:
             try:
-                # Check if feature is enabled
-                result = subprocess.run(
-                    ['powershell', '-Command', f'Get-WindowsOptionalFeature -Online -FeatureName {feature} | Select-Object -ExpandProperty State'],
-                    capture_output=True,
-                    text=True
-                )
-                
-                if result.returncode == 0 and 'Enabled' in result.stdout:
-                    console.print(f"[green][+] {description} - Enabled[/green]")
-                    enabled_features.append(feature)
-                else:
-                    console.print(f"[yellow][!] {description} - Not Enabled[/yellow]")
-                    # Try to enable
-                    enable_result = subprocess.run(
-                        ['powershell', '-Command', f'Enable-WindowsOptionalFeature -Online -FeatureName {feature} -NoRestart'],
+                # Only check Windows features on Windows platform
+                if platform.system() == 'Windows':
+                    # Check if feature is enabled
+                    result = subprocess.run(
+                        ['powershell', '-Command', f'Get-WindowsOptionalFeature -Online -FeatureName {feature} | Select-Object -ExpandProperty State'],
                         capture_output=True,
                         text=True
                     )
-                    if enable_result.returncode == 0:
-                        console.print(f"[green][+] Enabled {description}[/green]")
+                    
+                    if result.returncode == 0 and 'Enabled' in result.stdout:
+                        console.print(f"[green][+] {description} - Enabled[/green]")
                         enabled_features.append(feature)
                     else:
-                        console.print(f"[red][-] Failed to enable {description}[/red]")
+                        console.print(f"[yellow][!] {description} - Not Enabled[/yellow]")
+                        # Try to enable
+                        enable_result = subprocess.run(
+                            ['powershell', '-Command', f'Enable-WindowsOptionalFeature -Online -FeatureName {feature} -NoRestart'],
+                            capture_output=True,
+                            text=True
+                        )
+                        if enable_result.returncode == 0:
+                            console.print(f"[green][+] Enabled {description}[/green]")
+                            enabled_features.append(feature)
+                        else:
+                            console.print(f"[red][-] Failed to enable {description}[/red]")
+                else:
+                    # On non-Windows systems, just report as not available
+                    console.print(f"[yellow][!] {description} - Not available on this platform[/yellow]")
             except Exception as e:
                 console.print(f"[yellow][!] Error checking {description}: {e}[/yellow]")
         

@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "name": "Next Valley",
+    "description": "Complete Windows 12 UI transformation for Windows 11 25H2",
+    "features": {
+        "floating_taskbar": true,
+        "modular_design": true,
+        "ai_integration": true,
+        "top_widgets": true,
+        "fluent_design_3": true,
+        "hybrid_optimization": true,
+        "rounded_corners": true,
+        "copilot_2_integration": true
+    }
+}

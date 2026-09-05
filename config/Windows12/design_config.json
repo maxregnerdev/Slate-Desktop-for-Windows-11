@@ -1,0 +1,11 @@
+{
+    "fluent_design_version": "3.0",
+    "rounded_corners": true,
+    "corner_radius": 12,
+    "mica_effect": true,
+    "acrylic_effect": true,
+    "animations": true,
+    "theme": "dark",
+    "accent_color": "#0078D4",
+    "transparency_level": 0.7
+}

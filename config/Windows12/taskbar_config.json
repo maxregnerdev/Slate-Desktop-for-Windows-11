@@ -1,0 +1,11 @@
+{
+    "floating": true,
+    "position": "bottom",
+    "transparency": 0.8,
+    "rounded_corners": true,
+    "corner_radius": 16,
+    "auto_hide": false,
+    "icon_size": "medium",
+    "labels": false,
+    "spacing": 8
+}

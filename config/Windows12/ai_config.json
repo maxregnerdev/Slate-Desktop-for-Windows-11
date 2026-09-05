@@ -1,0 +1,15 @@
+{
+    "copilot_2_enabled": true,
+    "ai_features": {
+        "smart_suggestions": true,
+        "context_aware_search": true,
+        "adaptive_ui": true,
+        "voice_control": false
+    },
+    "integration_points": [
+        "taskbar",
+        "start_menu",
+        "file_explorer",
+        "widgets"
+    ]
+}
