@@ -1,3 +1,29 @@
-requests
-colorama
-py7zr
+# Windows 12 UI Transformation - Dependencies
+# Version: 2.0.0 - Next Valley Edition
+
+# Core dependencies
+colorama==0.4.6
+requests==2.31.0
+py7zr==0.20.6
+pywin32==306
+psutil==5.9.8
+
+# JSON and configuration management
+json5==0.9.14
+pyyaml==6.0.1
+
+# Windows registry and system utilities
+winreg==1.2.2
+wmi==1.5.1
+
+# Progress and UI
+tqdm==4.66.2
+rich==13.7.0
+
+# File operations
+pyunpack==0.3.1
+patool==1.12
+
+# Network and downloads
+urllib3==2.0.7
+certifi==2024.2.2
