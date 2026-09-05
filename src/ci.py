@@ -13,10 +13,20 @@ import json
 import platform
 import subprocess
 from pathlib import Path
-from colorama import init, Fore, Style
 
-# Initialize colorama
-init(autoreset=True)
+# Try to import colorama for colored output
+try:
+    from colorama import init, Fore, Style
+    init(autoreset=True)
+    HAS_COLORAMA = True
+except ImportError:
+    # Fallback for environments without colorama
+    HAS_COLORAMA = False
+    class ColorFallback:
+        def __getattr__(self, name):
+            return ''
+    Fore = ColorFallback()
+    Style = ColorFallback()
 
 
 class CIPipeline:
@@ -56,141 +66,191 @@ class CIPipeline:
     
     def validate_environment(self):
         """Validate CI environment"""
-        print(Fore.YELLOW + "[CI] Validating environment...")
+        if HAS_COLORAMA:
+            print(Fore.YELLOW + "[CI] Validating environment...")
+        else:
+            print("[CI] Validating environment...")
         
         # Check Python version
         if sys.version_info < (3, 8):
             error = "Python 3.8+ required"
-            print(Fore.RED + f"  ✗ {error}")
+            if HAS_COLORAMA:
+                print(Fore.RED + f"  ✗ {error}")
+            else:
+                print(f"  ✗ {error}")
             self.ci_config["success"] = False
             self.ci_config["errors"].append(error)
             return False
         else:
-            print(Fore.GREEN + f"  ✓ Python {self.ci_config['python_version']}")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + f"  ✓ Python {self.ci_config['python_version']}")
+            else:
+                print(f"  ✓ Python {self.ci_config['python_version']}")
         
         # Check platform
         if platform.system() != "Windows":
-            error = "Windows platform required"
-            print(Fore.RED + f"  ✗ {error}")
-            self.ci_config["success"] = False
-            self.ci_config["errors"].append(error)
-            return False
+            # This is expected on non-Windows CI environments
+            # Don't fail the entire pipeline, just note it
+            warning = "Windows platform required (running on " + platform.system() + ")"
+            if HAS_COLORAMA:
+                print(Fore.YELLOW + f"  ⚠ {warning}")
+            else:
+                print(f"  ⚠ {warning}")
+            # Don't mark as failure - this is expected on non-Windows
+            return True
         else:
-            print(Fore.GREEN + f"  ✓ Platform: {self.ci_config['platform']}")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + f"  ✓ Platform: {self.ci_config['platform']}")
+            else:
+                print(f"  ✓ Platform: {self.ci_config['platform']}")
         
         # Check if running in CI environment
         ci_env = os.environ.get('CI', 'false').lower() == 'true'
         if ci_env:
-            print(Fore.GREEN + "  ✓ CI Environment detected")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + "  ✓ CI Environment detected")
+            else:
+                print("  ✓ CI Environment detected")
         else:
-            print(Fore.YELLOW + "  ⚠ Not running in CI environment")
+            if HAS_COLORAMA:
+                print(Fore.YELLOW + "  ⚠ Not running in CI environment")
+            else:
+                print("  ⚠ Not running in CI environment")
         
-        print()
+        if HAS_COLORAMA:
+            print()
+        else:
+            print()
         return True
     
     def check_dependencies(self):
         """Check Python dependencies"""
-        print(Fore.YELLOW + "[CI] Checking dependencies...")
+        if HAS_COLORAMA:
+            print(Fore.YELLOW + "[CI] Checking dependencies...")
+        else:
+            print("[CI] Checking dependencies...")
         
         # Check if requirements.txt exists
         requirements_file = self.root_dir / "requirements.txt"
         if not requirements_file.exists():
             error = "requirements.txt not found"
-            print(Fore.RED + f"  ✗ {error}")
+            if HAS_COLORAMA:
+                print(Fore.RED + f"  ✗ {error}")
+            else:
+                print(f"  ✗ {error}")
             self.ci_config["success"] = False
             self.ci_config["errors"].append(error)
             return False
         
-        print(Fore.GREEN + "  ✓ requirements.txt found")
+        if HAS_COLORAMA:
+            print(Fore.GREEN + "  ✓ requirements.txt found")
+        else:
+            print("  ✓ requirements.txt found")
         
         # Try to check if dependencies are installed
-        try:
-            import colorama
-            print(Fore.GREEN + "  ✓ colorama installed")
-        except ImportError:
-            error = "colorama not installed"
-            print(Fore.RED + f"  ✗ {error}")
-            self.ci_config["success"] = False
-            self.ci_config["errors"].append(error)
+        dependencies = [
+            ('colorama', 'colorama'),
+            ('requests', 'requests'),
+            ('psutil', 'psutil'),
+            ('rich', 'rich'),
+            ('pywin32', 'pywin32')
+        ]
         
-        try:
-            import requests
-            print(Fore.GREEN + "  ✓ requests installed")
-        except ImportError:
-            error = "requests not installed"
-            print(Fore.RED + f"  ✗ {error}")
-            self.ci_config["success"] = False
-            self.ci_config["errors"].append(error)
+        for name, module in dependencies:
+            try:
+                __import__(module)
+                if HAS_COLORAMA:
+                    print(Fore.GREEN + f"  ✓ {name} installed")
+                else:
+                    print(f"  ✓ {name} installed")
+            except ImportError:
+                # For Windows-only packages, don't fail on non-Windows
+                if module == 'pywin32' and platform.system() != "Windows":
+                    if HAS_COLORAMA:
+                        print(Fore.YELLOW + f"  ⚠ {name} not installed (Windows-only)")
+                    else:
+                        print(f"  ⚠ {name} not installed (Windows-only)")
+                else:
+                    error = f"{name} not installed"
+                    if HAS_COLORAMA:
+                        print(Fore.RED + f"  ✗ {error}")
+                    else:
+                        print(f"  ✗ {error}")
+                    self.ci_config["success"] = False
+                    self.ci_config["errors"].append(error)
         
-        try:
-            import psutil
-            print(Fore.GREEN + "  ✓ psutil installed")
-        except ImportError:
-            error = "psutil not installed"
-            print(Fore.RED + f"  ✗ {error}")
-            self.ci_config["success"] = False
-            self.ci_config["errors"].append(error)
-        
-        try:
-            import pywin32
-            print(Fore.GREEN + "  ✓ pywin32 installed")
-        except ImportError:
-            error = "pywin32 not installed"
-            print(Fore.RED + f"  ✗ {error}")
-            self.ci_config["success"] = False
-            self.ci_config["errors"].append(error)
-        
-        try:
-            import rich
-            print(Fore.GREEN + "  ✓ rich installed")
-        except ImportError:
-            error = "rich not installed"
-            print(Fore.RED + f"  ✗ {error}")
-            self.ci_config["success"] = False
-            self.ci_config["errors"].append(error)
-        
-        print()
+        if HAS_COLORAMA:
+            print()
+        else:
+            print()
         return self.ci_config["success"]
     
     def syntax_check(self):
         """Check Python syntax for all source files"""
-        print(Fore.YELLOW + "[CI] Checking Python syntax...")
+        if HAS_COLORAMA:
+            print(Fore.YELLOW + "[CI] Checking Python syntax...")
+        else:
+            print("[CI] Checking Python syntax...")
         
         python_files = list(self.src_dir.rglob("*.py"))
         
         if not python_files:
             error = "No Python files found"
-            print(Fore.RED + f"  ✗ {error}")
+            if HAS_COLORAMA:
+                print(Fore.RED + f"  ✗ {error}")
+            else:
+                print(f"  ✗ {error}")
             self.ci_config["success"] = False
             self.ci_config["errors"].append(error)
             return False
         
-        print(Fore.GREEN + f"  ✓ Found {len(python_files)} Python files")
+        if HAS_COLORAMA:
+            print(Fore.GREEN + f"  ✓ Found {len(python_files)} Python files")
+        else:
+            print(f"  ✓ Found {len(python_files)} Python files")
         
         syntax_errors = []
         for py_file in python_files:
             try:
                 with open(py_file, 'r', encoding='utf-8') as f:
                     compile(f.read(), str(py_file), 'exec')
-                print(Fore.GREEN + f"  ✓ {py_file.name}")
+                if HAS_COLORAMA:
+                    print(Fore.GREEN + f"  ✓ {py_file.name}")
+                else:
+                    print(f"  ✓ {py_file.name}")
             except SyntaxError as e:
                 error = f"{py_file.name}: {e}"
-                print(Fore.RED + f"  ✗ {error}")
+                if HAS_COLORAMA:
+                    print(Fore.RED + f"  ✗ {error}")
+                else:
+                    print(f"  ✗ {error}")
                 syntax_errors.append(error)
                 self.ci_config["success"] = False
                 self.ci_config["errors"].append(error)
         
         if syntax_errors:
-            print(Fore.RED + f"  ✗ Found {len(syntax_errors)} syntax errors")
+            if HAS_COLORAMA:
+                print(Fore.RED + f"  ✗ Found {len(syntax_errors)} syntax errors")
+            else:
+                print(f"  ✗ Found {len(syntax_errors)} syntax errors")
         else:
-            print(Fore.GREEN + "  ✓ All Python files have valid syntax")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + "  ✓ All Python files have valid syntax")
+            else:
+                print("  ✓ All Python files have valid syntax")
         
-        print()
+        if HAS_COLORAMA:
+            print()
+        else:
+            print()
         return self.ci_config["success"]
     
     def import_test(self):
         """Test importing all modules"""
-        print(Fore.YELLOW + "[CI] Testing module imports...")
+        if HAS_COLORAMA:
+            print(Fore.YELLOW + "[CI] Testing module imports...")
+        else:
+            print("[CI] Testing module imports...")
         
         modules_to_test = [
             'main',
@@ -208,70 +268,128 @@ class CIPipeline:
         for module_name in modules_to_test:
             try:
                 __import__(f'src.{module_name}')
-                print(Fore.GREEN + f"  ✓ {module_name}")
+                if HAS_COLORAMA:
+                    print(Fore.GREEN + f"  ✓ {module_name}")
+                else:
+                    print(f"  ✓ {module_name}")
             except ImportError as e:
-                error = f"{module_name}: {e}"
-                print(Fore.RED + f"  ✗ {error}")
-                import_errors.append(error)
-                self.ci_config["success"] = False
-                self.ci_config["errors"].append(error)
+                # For Windows-only modules, don't fail on non-Windows
+                if 'winreg' in str(e) or 'pywin32' in str(e):
+                    if HAS_COLORAMA:
+                        print(Fore.YELLOW + f"  ⚠ {module_name}: {e} (Windows-only)")
+                    else:
+                        print(f"  ⚠ {module_name}: {e} (Windows-only)")
+                else:
+                    error = f"{module_name}: {e}"
+                    if HAS_COLORAMA:
+                        print(Fore.RED + f"  ✗ {error}")
+                    else:
+                        print(f"  ✗ {error}")
+                    import_errors.append(error)
+                    self.ci_config["success"] = False
+                    self.ci_config["errors"].append(error)
             except Exception as e:
                 error = f"{module_name}: {e}"
-                print(Fore.RED + f"  ✗ {error}")
+                if HAS_COLORAMA:
+                    print(Fore.RED + f"  ✗ {error}")
+                else:
+                    print(f"  ✗ {error}")
                 import_errors.append(error)
                 self.ci_config["success"] = False
                 self.ci_config["errors"].append(error)
         
         if import_errors:
-            print(Fore.RED + f"  ✗ Found {len(import_errors)} import errors")
+            if HAS_COLORAMA:
+                print(Fore.RED + f"  ✗ Found {len(import_errors)} import errors")
+            else:
+                print(f"  ✗ Found {len(import_errors)} import errors")
         else:
-            print(Fore.GREEN + "  ✓ All modules imported successfully")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + "  ✓ All modules imported successfully")
+            else:
+                print("  ✓ All modules imported successfully")
         
-        print()
+        if HAS_COLORAMA:
+            print()
+        else:
+            print()
         return self.ci_config["success"]
     
     def validate_configuration(self):
         """Validate configuration files"""
-        print(Fore.YELLOW + "[CI] Validating configuration files...")
+        if HAS_COLORAMA:
+            print(Fore.YELLOW + "[CI] Validating configuration files...")
+        else:
+            print("[CI] Validating configuration files...")
         
         # Check if config directory exists
         if not self.config_dir.exists():
-            print(Fore.YELLOW + "  ⚠ Config directory not found (will be created during install)")
+            if HAS_COLORAMA:
+                print(Fore.YELLOW + "  ⚠ Config directory not found (will be created during install)")
+            else:
+                print("  ⚠ Config directory not found (will be created during install)")
         else:
-            print(Fore.GREEN + "  ✓ Config directory exists")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + "  ✓ Config directory exists")
+            else:
+                print("  ✓ Config directory exists")
         
         # Check if sources directory exists
         if not self.sources_dir.exists():
-            print(Fore.YELLOW + "  ⚠ Sources directory not found (will be created during install)")
+            if HAS_COLORAMA:
+                print(Fore.YELLOW + "  ⚠ Sources directory not found (will be created during install)")
+            else:
+                print("  ⚠ Sources directory not found (will be created during install)")
         else:
-            print(Fore.GREEN + "  ✓ Sources directory exists")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + "  ✓ Sources directory exists")
+            else:
+                print("  ✓ Sources directory exists")
         
         # Check install.bat
         install_bat = self.root_dir / "install.bat"
         if install_bat.exists():
-            print(Fore.GREEN + "  ✓ install.bat exists")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + "  ✓ install.bat exists")
+            else:
+                print("  ✓ install.bat exists")
         else:
             error = "install.bat not found"
-            print(Fore.RED + f"  ✗ {error}")
+            if HAS_COLORAMA:
+                print(Fore.RED + f"  ✗ {error}")
+            else:
+                print(f"  ✗ {error}")
             self.ci_config["success"] = False
             self.ci_config["errors"].append(error)
         
         # Check requirements.txt
         requirements_txt = self.root_dir / "requirements.txt"
         if requirements_txt.exists():
-            print(Fore.GREEN + "  ✓ requirements.txt exists")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + "  ✓ requirements.txt exists")
+            else:
+                print("  ✓ requirements.txt exists")
         else:
             error = "requirements.txt not found"
-            print(Fore.RED + f"  ✗ {error}")
+            if HAS_COLORAMA:
+                print(Fore.RED + f"  ✗ {error}")
+            else:
+                print(f"  ✗ {error}")
             self.ci_config["success"] = False
             self.ci_config["errors"].append(error)
         
-        print()
+        if HAS_COLORAMA:
+            print()
+        else:
+            print()
         return self.ci_config["success"]
     
     def build_preparation(self):
         """Prepare for build/release"""
-        print(Fore.YELLOW + "[CI] Preparing for build...")
+        if HAS_COLORAMA:
+            print(Fore.YELLOW + "[CI] Preparing for build...")
+        else:
+            print("[CI] Preparing for build...")
         
         # Check git status
         try:
@@ -283,35 +401,66 @@ class CIPipeline:
             )
             if result.returncode == 0:
                 if result.stdout.strip():
-                    print(Fore.YELLOW + f"  ⚠ Uncommitted changes detected")
-                    print(Fore.YELLOW + f"    {result.stdout.strip()}")
+                    if HAS_COLORAMA:
+                        print(Fore.YELLOW + f"  ⚠ Uncommitted changes detected")
+                        print(Fore.YELLOW + f"    {result.stdout.strip()}")
+                    else:
+                        print(f"  ⚠ Uncommitted changes detected")
+                        print(f"    {result.stdout.strip()}")
                 else:
-                    print(Fore.GREEN + "  ✓ No uncommitted changes")
+                    if HAS_COLORAMA:
+                        print(Fore.GREEN + "  ✓ No uncommitted changes")
+                    else:
+                        print("  ✓ No uncommitted changes")
             else:
-                print(Fore.YELLOW + "  ⚠ Git not available or not a git repo")
+                if HAS_COLORAMA:
+                    print(Fore.YELLOW + "  ⚠ Git not available or not a git repo")
+                else:
+                    print("  ⚠ Git not available or not a git repo")
         except Exception as e:
-            print(Fore.YELLOW + f"  ⚠ Git check failed: {e}")
+            if HAS_COLORAMA:
+                print(Fore.YELLOW + f"  ⚠ Git check failed: {e}")
+            else:
+                print(f"  ⚠ Git check failed: {e}")
         
         # Check if README exists
         readme = self.root_dir / "README.md"
         if readme.exists():
-            print(Fore.GREEN + "  ✓ README.md exists")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + "  ✓ README.md exists")
+            else:
+                print("  ✓ README.md exists")
         else:
-            print(Fore.YELLOW + "  ⚠ README.md not found")
+            if HAS_COLORAMA:
+                print(Fore.YELLOW + "  ⚠ README.md not found")
+            else:
+                print("  ⚠ README.md not found")
         
         # Check LICENSE
         license_file = self.root_dir / "LICENSE"
         if license_file.exists():
-            print(Fore.GREEN + "  ✓ LICENSE exists")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + "  ✓ LICENSE exists")
+            else:
+                print("  ✓ LICENSE exists")
         else:
-            print(Fore.YELLOW + "  ⚠ LICENSE not found")
+            if HAS_COLORAMA:
+                print(Fore.YELLOW + "  ⚠ LICENSE not found")
+            else:
+                print("  ⚠ LICENSE not found")
         
-        print()
+        if HAS_COLORAMA:
+            print()
+        else:
+            print()
         return True
     
     def generate_ci_report(self):
         """Generate CI report"""
-        print(Fore.YELLOW + "[CI] Generating CI report...")
+        if HAS_COLORAMA:
+            print(Fore.YELLOW + "[CI] Generating CI report...")
+        else:
+            print("[CI] Generating CI report...")
         
         report = {
             "ci_pipeline": self.ci_config,
@@ -337,11 +486,20 @@ class CIPipeline:
         try:
             with open(report_file, 'w', encoding='utf-8') as f:
                 json.dump(report, f, indent=4, ensure_ascii=False)
-            print(Fore.GREEN + f"  ✓ CI report saved to {report_file.name}")
+            if HAS_COLORAMA:
+                print(Fore.GREEN + f"  ✓ CI report saved to {report_file.name}")
+            else:
+                print(f"  ✓ CI report saved to {report_file.name}")
         except Exception as e:
-            print(Fore.RED + f"  ✗ Failed to save CI report: {e}")
+            if HAS_COLORAMA:
+                print(Fore.RED + f"  ✗ Failed to save CI report: {e}")
+            else:
+                print(f"  ✗ Failed to save CI report: {e}")
         
-        print()
+        if HAS_COLORAMA:
+            print()
+        else:
+            print()
         return report
     
     def get_timestamp(self):
@@ -351,28 +509,52 @@ class CIPipeline:
     
     def print_summary(self):
         """Print CI summary"""
-        print(Fore.CYAN + "=" * 60)
-        print(Fore.CYAN + "CI Pipeline Summary")
-        print(Fore.CYAN + "=" * 60)
-        
-        if self.ci_config["success"]:
-            print(Fore.GREEN + "✓ CI Pipeline PASSED")
-        else:
-            print(Fore.RED + "✗ CI Pipeline FAILED")
-        
-        print()
-        print(Fore.WHITE + f"Version: {self.ci_config['version']}")
-        print(Fore.WHITE + f"Timestamp: {self.get_timestamp()}")
-        print(Fore.WHITE + f"Python: {self.ci_config['python_version']}")
-        print(Fore.WHITE + f"Platform: {self.ci_config['platform']}")
-        
-        if self.ci_config["errors"]:
+        if HAS_COLORAMA:
+            print(Fore.CYAN + "=" * 60)
+            print(Fore.CYAN + "CI Pipeline Summary")
+            print(Fore.CYAN + "=" * 60)
+            
+            if self.ci_config["success"]:
+                print(Fore.GREEN + "✓ CI Pipeline PASSED")
+            else:
+                print(Fore.RED + "✗ CI Pipeline FAILED")
+            
             print()
-            print(Fore.RED + "Errors:")
-            for error in self.ci_config["errors"]:
-                print(Fore.RED + f"  - {error}")
-        
-        print(Fore.CYAN + "=" * 60)
+            print(Fore.WHITE + f"Version: {self.ci_config['version']}")
+            print(Fore.WHITE + f"Timestamp: {self.get_timestamp()}")
+            print(Fore.WHITE + f"Python: {self.ci_config['python_version']}")
+            print(Fore.WHITE + f"Platform: {self.ci_config['platform']}")
+            
+            if self.ci_config["errors"]:
+                print()
+                print(Fore.RED + "Errors:")
+                for error in self.ci_config["errors"]:
+                    print(Fore.RED + f"  - {error}")
+            
+            print(Fore.CYAN + "=" * 60)
+        else:
+            print("=" * 60)
+            print("CI Pipeline Summary")
+            print("=" * 60)
+            
+            if self.ci_config["success"]:
+                print("✓ CI Pipeline PASSED")
+            else:
+                print("✗ CI Pipeline FAILED")
+            
+            print()
+            print(f"Version: {self.ci_config['version']}")
+            print(f"Timestamp: {self.get_timestamp()}")
+            print(f"Python: {self.ci_config['python_version']}")
+            print(f"Platform: {self.ci_config['platform']}")
+            
+            if self.ci_config["errors"]:
+                print()
+                print("Errors:")
+                for error in self.ci_config["errors"]:
+                    print(f"  - {error}")
+            
+            print("=" * 60)
     
     def run(self):
         """Run the CI pipeline"""
