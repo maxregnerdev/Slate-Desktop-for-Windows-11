@@ -81,12 +81,12 @@ class Windows12ThemeModule:
             }
         }
         
-        # Theme paths
+        # Theme paths - using raw strings for Windows paths
         self.theme_paths = {
             'resources': Path(__file__).parent.parent.parent.parent / 'sources' / 'downloads' / '04 - Themes',
-            'themes_folder': Path('C:\Windows\Resources\Themes'),
-            'system32': Path('C:\Windows\System32'),
-            'syswow64': Path('C:\Windows\SysWOW64')
+            'themes_folder': Path(r'C:\Windows\Resources\Themes'),
+            'system32': Path(r'C:\Windows\System32'),
+            'syswow64': Path(r'C:\Windows\SysWOW64')
         }
     
     def get_name(self) -> str:
@@ -266,7 +266,7 @@ class Windows12ThemeModule:
             else:
                 print(f"⚠ SecureUXTheme not running, attempting to start...")
                 # Try to start SecureUXTheme
-                secureux_path = Path('C:\Program Files\SecureUxTheme\ThemeTool.exe')
+                secureux_path = Path(r'C:\Program Files\SecureUxTheme\ThemeTool.exe')
                 if secureux_path.exists():
                     subprocess.Popen([str(secureux_path)])
                     print(f"✓ Started SecureUXTheme")
@@ -275,7 +275,7 @@ class Windows12ThemeModule:
                     return False
             
             # Apply theme using UXThemePatcher if needed
-            uxtheme_path = Path('C:\Program Files\UXThemePatcher\UXThemePatcher.exe')
+            uxtheme_path = Path(r'C:\Program Files\UXThemePatcher\UXThemePatcher.exe')
             if uxtheme_path.exists():
                 result = subprocess.run(
                     [str(uxtheme_path), '/apply'],
@@ -344,7 +344,7 @@ class Windows12ThemeModule:
         
         try:
             # Check if 7TSP is installed
-            tsp_path = Path('C:\Program Files\7TSP\7tsp_gui.exe')
+            tsp_path = Path(r'C:\Program Files\7TSP\7tsp_gui.exe')
             if not tsp_path.exists():
                 print(f"⚠ 7TSP not found, icon installation may not work")
             
@@ -414,42 +414,41 @@ class Windows12ThemeModule:
         """Create PowerShell script for theme management"""
         print(f"Creating theme management script...")
         
-        script_content = f'''
-# Windows 12 Theme Management Script
+        script_content = """# Windows 12 Theme Management Script
 # Version: 2.0.0 - Next Valley Edition
 
 param(
-    [string]$ThemeName = "{self.config['theme_name']}",
-    [string]$BaseTheme = "{self.config['base_theme']}",
+    [string]$ThemeName = "Windows 12 Next Valley",
+    [string]$BaseTheme = "pi11z",
     [bool]$ApplyTheme = $True,
     [bool]$PatchSystem = $True
 )
 
 # Patch system for third-party themes
-if ($PatchSystem) {{
+if ($PatchSystem) {
     # Check and start SecureUXTheme
-    if (Test-Path "C:\\Program Files\\SecureUxTheme\\ThemeTool.exe") {{
+    if (Test-Path "C:\\Program Files\\SecureUxTheme\\ThemeTool.exe") {
         $process = Get-Process -Name ThemeTool -ErrorAction SilentlyContinue
-        if (-not $process) {{
+        if (-not $process) {
             Start-Process -FilePath "C:\\Program Files\\SecureUxTheme\\ThemeTool.exe"
             Start-Sleep -Seconds 2
-        }}
+        }
         Write-Host "SecureUXTheme is running" -ForegroundColor Green
-    }} else {{
+    } else {
         Write-Host "SecureUXTheme not found" -ForegroundColor Yellow
-    }}
+    }
     
     # Apply UXThemePatcher
-    if (Test-Path "C:\\Program Files\\UXThemePatcher\\UXThemePatcher.exe") {{
+    if (Test-Path "C:\\Program Files\\UXThemePatcher\\UXThemePatcher.exe") {
         & "C:\\Program Files\\UXThemePatcher\\UXThemePatcher.exe" /apply
         Write-Host "UXThemePatcher applied" -ForegroundColor Green
-    }} else {{
+    } else {
         Write-Host "UXThemePatcher not found" -ForegroundColor Yellow
-    }}
-}}
+    }
+}
 
 # Apply theme
-if ($ApplyTheme) {{
+if ($ApplyTheme) {
     # Set theme registry values
     $themeReg = "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes"
     Set-ItemProperty -Path $themeReg -Name "CurrentTheme" -Value $ThemeName
@@ -458,23 +457,23 @@ if ($ApplyTheme) {{
     
     # Set window metrics
     $metricsReg = "HKCU:\\Control Panel\\Desktop\\WindowMetrics"
-    Set-ItemProperty -Path $metricsReg -Name "BorderWidth" -Value {self.config['window_metrics']['border_width']}
-    Set-ItemProperty -Path $metricsReg -Name "CaptionHeight" -Value {self.config['window_metrics']['caption_height']}
+    Set-ItemProperty -Path $metricsReg -Name "BorderWidth" -Value -15
+    Set-ItemProperty -Path $metricsReg -Name "CaptionHeight" -Value 24
     
     # Restart Windows Explorer to apply theme
     Stop-Process -Name "explorer" -Force
     Start-Process "explorer.exe"
     
     Write-Host "Windows 12 Theme applied!" -ForegroundColor Green
-}}
+}
 
 # Apply icons using 7TSP
-if (Test-Path "C:\\Program Files\\7TSP\\7tsp_gui.exe") {{
+if (Test-Path "C:\\Program Files\\7TSP\\7tsp_gui.exe") {
     Write-Host "7TSP found - apply icons manually through GUI" -ForegroundColor Cyan
-}} else {{
+} else {
     Write-Host "7TSP not found - icons cannot be applied" -ForegroundColor Yellow
-}}
-'''
+}
+"""
         
         try:
             scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'

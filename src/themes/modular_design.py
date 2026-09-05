@@ -276,18 +276,12 @@ class ModularDesignModule:
             print(f"✗ Error creating module manifest: {e}")
             return False
     
-    def create_component_loader(self) -> bool:
-        """Create component loader script"""
-        print(f"Creating component loader...")
+    def create_component_loader_script(self) -> bool:
+        """Create component loader script file"""
+        print(f"Creating component loader script...")
         
-        loader_content = """#!/usr/bin/env python3
-"""
-Windows 12 Modular Design Component Loader
-Version: 2.0.0 - Next Valley Edition
-
-Loads and manages Windows 12 UI components in a modular fashion.
-"""
-
+        # Create the component loader as a separate file
+        loader_script = """#!/usr/bin/env python3
 import json
 import sys
 import importlib
@@ -297,8 +291,6 @@ import traceback
 
 
 class ComponentLoader:
-    """Dynamic component loader for Windows 12 UI"""
-    
     def __init__(self, manifest_path: str):
         self.manifest_path = Path(manifest_path)
         self.manifest = {}
@@ -306,7 +298,6 @@ class ComponentLoader:
         self.loaded_components = []
         
     def load_manifest(self) -> bool:
-        """Load the module manifest"""
         try:
             if self.manifest_path.exists():
                 with open(self.manifest_path, 'r') as f:
@@ -320,8 +311,7 @@ class ComponentLoader:
             return False
     
     def resolve_dependencies(self, module_name: str) -> bool:
-        """Resolve dependencies for a module"""
-        if module_name not in self.manifest['modules']:
+        if module_name not in self.manifest.get('modules', {}):
             return False
         
         module = self.manifest['modules'][module_name]
@@ -334,106 +324,88 @@ class ComponentLoader:
         return True
     
     def load_component(self, module_name: str) -> bool:
-        """Load a component dynamically"""
         try:
             if module_name in self.components:
                 return True
             
-            if module_name not in self.manifest['modules']:
+            if module_name not in self.manifest.get('modules', {}):
                 print(f"Module not in manifest: {module_name}")
                 return False
             
             module_info = self.manifest['modules'][module_name]
             
-            # Resolve dependencies first
             if not self.resolve_dependencies(module_name):
                 print(f"Failed to resolve dependencies for: {module_name}")
                 return False
             
-            # Import the module
             module_path = module_info['path']
             try:
                 module = importlib.import_module(module_path)
-                
-                # Get the component class
                 component_class = getattr(module, module_name.replace('_', '').capitalize() + 'Module')
                 component = component_class()
-                
                 self.components[module_name] = component
                 self.loaded_components.append(module_name)
-                
-                print(f"✓ Loaded component: {module_name}")
+                print(f"Loaded component: {module_name}")
                 return True
                 
             except ImportError as e:
-                print(f"✗ Failed to import {module_path}: {e}")
+                print(f"Failed to import {module_path}: {e}")
                 return False
             except AttributeError as e:
-                print(f"✗ Component class not found in {module_path}: {e}")
+                print(f"Component class not found in {module_path}: {e}")
                 return False
                 
         except Exception as e:
-            print(f"✗ Error loading component {module_name}: {e}")
+            print(f"Error loading component {module_name}: {e}")
             traceback.print_exc()
             return False
     
     def load_all_components(self) -> bool:
-        """Load all components from the manifest"""
         print("Loading all Windows 12 UI components...")
-        
         success = True
-        for module_name, module_info in self.manifest['modules'].items():
+        for module_name, module_info in self.manifest.get('modules', {}).items():
             if module_info.get('enabled', True):
                 if not self.load_component(module_name):
-                    print(f"✗ Failed to load: {module_name}")
+                    print(f"Failed to load: {module_name}")
                     success = False
-        
         return success
     
     def install_component(self, module_name: str) -> bool:
-        """Install a specific component"""
         if module_name not in self.components:
             if not self.load_component(module_name):
                 return False
         
         component = self.components[module_name]
-        
         try:
             result = component.install()
             if result:
-                print(f"✓ Installed: {module_name}")
+                print(f"Installed: {module_name}")
             else:
-                print(f"✗ Failed to install: {module_name}")
+                print(f"Failed to install: {module_name}")
             return result
         except Exception as e:
-            print(f"✗ Error installing {module_name}: {e}")
+            print(f"Error installing {module_name}: {e}")
             return False
     
     def install_all_components(self) -> bool:
-        """Install all loaded components"""
         print("Installing all Windows 12 UI components...")
-        
         success = True
         for module_name in self.loaded_components:
             if not self.install_component(module_name):
                 success = False
-        
         return success
     
     def get_status(self) -> Dict[str, Any]:
-        """Get loader status"""
         return {
             'manifest_loaded': len(self.manifest) > 0,
             'components_loaded': len(self.components),
             'loaded_components': self.loaded_components,
-            'available_components': list(self.manifest['modules'].keys())
+            'available_components': list(self.manifest.get('modules', {}).keys())
         }
 
 
 def main():
-    """Main entry point"""
     manifest_path = Path(__file__).parent.parent.parent.parent / 'config' / 'Windows12' / 'modular_design_manifest.json'
-    
     loader = ComponentLoader(manifest_path)
     
     if not loader.load_manifest():
@@ -442,14 +414,12 @@ def main():
     
     print(f"Loaded manifest with {len(loader.manifest.get('modules', {}))} modules")
     
-    # Load all components
     if not loader.load_all_components():
         print("Failed to load some components")
         return 1
     
     print(f"Loaded {len(loader.components)} components")
     
-    # Install all components
     if not loader.install_all_components():
         print("Failed to install some components")
         return 1
@@ -468,12 +438,12 @@ if __name__ == "__main__":
             loader_file = scripts_dir / 'component_loader.py'
             
             with open(loader_file, 'w') as f:
-                f.write(loader_content)
+                f.write(loader_script)
             
-            print(f"✓ Component loader created: {loader_file}")
+            print(f"✓ Component loader script created: {loader_file}")
             return True
         except Exception as e:
-            print(f"✗ Error creating component loader: {e}")
+            print(f"✗ Error creating component loader script: {e}")
             return False
     
     def create_modular_config(self) -> bool:
@@ -522,8 +492,7 @@ if __name__ == "__main__":
         """Create PowerShell script for modular system management"""
         print(f"Creating modular system script...")
         
-        script_content = f'''
-# Windows 12 Modular Design System Management Script
+        script_content = """# Windows 12 Modular Design System Management Script
 # Version: 2.0.0 - Next Valley Edition
 
 param(
@@ -534,93 +503,85 @@ param(
 
 $manifestPath = "$env:USERPROFILE\\Documents\\Slate-Desktop-for-Windows-11\\config\\Windows12\\modular_design_manifest.json"
 
-function Get-ModularStatus {{
-    if (Test-Path $manifestPath) {{
+function Get-ModularStatus {
+    if (Test-Path $manifestPath) {
         $manifest = Get-Content $manifestPath | ConvertFrom-Json
-        
-        $status = @{{
+        $status = @{
             ManifestLoaded = $True
             TotalModules = $manifest.modules.Count
-            EnabledModules = ($manifest.modules.Values | Where-Object {{ $_.enabled }}).Count
+            EnabledModules = ($manifest.modules.Values | Where-Object { $_.enabled }).Count
             ModuleTypes = ($manifest.modules.Values | Group-Object -Property type | Select-Object Name, Count)
-        }}
-        
+        }
         return $status
-    }} else {{
-        return @{{ ManifestLoaded = $False }}
-    }}
-}}
+    } else {
+        return @{ ManifestLoaded = $False }
+    }
+}
 
-function Load-ModuleManually {{
+function Load-ModuleManually {
     param([string]$ModuleName)
-    
     $pythonPath = "$env:USERPROFILE\\Documents\\Slate-Desktop-for-Windows-11\\src\\modules\\$ModuleName.py"
-    
-    if (Test-Path $pythonPath) {{
+    if (Test-Path $pythonPath) {
         & python $pythonPath install
         return $True
-    }} else {{
+    } else {
         Write-Host "Module not found: $ModuleName" -ForegroundColor Red
         return $False
-    }}
-}}
+    }
+}
 
-function Install-AllModules {{
+function Install-AllModules {
     $manifest = Get-Content $manifestPath | ConvertFrom-Json
-    
     $success = $True
-    foreach ($moduleName in $manifest.modules.Keys) {{
-        if ($manifest.modules[$moduleName].enabled) {{
-            if (-not (Load-ModuleManually -ModuleName $moduleName)) {{
+    foreach ($moduleName in $manifest.modules.Keys) {
+        if ($manifest.modules[$moduleName].enabled) {
+            if (-not (Load-ModuleManually -ModuleName $moduleName)) {
                 $success = $False
-            }}
-        }}
-    }}
-    
+            }
+        }
+    }
     return $success
-}}
+}
 
-# Main actions
-switch ($Action) {{
-    "status" {{
+switch ($Action) {
+    "status" {
         $status = Get-ModularStatus
         Write-Host "Windows 12 Modular Design System Status" -ForegroundColor Cyan
         Write-Host "Manifest Loaded: $($status.ManifestLoaded)" -ForegroundColor Green
         Write-Host "Total Modules: $($status.TotalModules)" -ForegroundColor Green
         Write-Host "Enabled Modules: $($status.EnabledModules)" -ForegroundColor Green
-        
-        if ($status.ModuleTypes) {{
-            foreach ($type in $status.ModuleTypes) {{
+        if ($status.ModuleTypes) {
+            foreach ($type in $status.ModuleTypes) {
                 Write-Host "  $($type.Name): $($type.Count)" -ForegroundColor Yellow
-            }}
-        }}
-    }}
-    "load" {{
-        if ($All) {{
+            }
+        }
+    }
+    "load" {
+        if ($All) {
             Install-AllModules
-        }} elseif ($Module) {{
+        } elseif ($Module) {
             Load-ModuleManually -ModuleName $Module
-        }} else {{
+        } else {
             Write-Host "Please specify a module or use -All" -ForegroundColor Yellow
-        }}
-    }}
-    "install" {{
-        if ($All) {{
+        }
+    }
+    "install" {
+        if ($All) {
             Install-AllModules
-        }} elseif ($Module) {{
+        } elseif ($Module) {
             Load-ModuleManually -ModuleName $Module
-        }} else {{
+        } else {
             Write-Host "Please specify a module or use -All" -ForegroundColor Yellow
-        }}
-    }}
-    default {{
+        }
+    }
+    default {
         Write-Host "Windows 12 Modular Design System" -ForegroundColor Cyan
         Write-Host "Usage: .\\configure_modular.ps1 -Action [status|load|install] -Module [module_name] -All"
-    }}
+    }
 }
 
 Write-Host "Windows 12 Modular Design System operation completed!" -ForegroundColor Green
-'''
+"""
         
         try:
             scripts_dir = Path(__file__).parent.parent.parent / 'src' / 'scripts'
@@ -655,9 +616,9 @@ Write-Host "Windows 12 Modular Design System operation completed!" -ForegroundCo
             print(f"✗ Failed to create module manifest")
             success = False
         
-        # Step 3: Create component loader
-        if not self.create_component_loader():
-            print(f"✗ Failed to create component loader")
+        # Step 3: Create component loader script
+        if not self.create_component_loader_script():
+            print(f"✗ Failed to create component loader script")
             success = False
         
         # Step 4: Create modular configuration
@@ -694,11 +655,11 @@ Write-Host "Windows 12 Modular Design System operation completed!" -ForegroundCo
                 config_file.unlink()
                 print(f"✓ Removed modular configuration")
             
-            # Remove component loader
+            # Remove component loader script
             loader_file = Path(__file__).parent.parent.parent / 'src' / 'scripts' / 'component_loader.py'
             if loader_file.exists():
                 loader_file.unlink()
-                print(f"✓ Removed component loader")
+                print(f"✓ Removed component loader script")
             
             # Remove modular script
             script_file = Path(__file__).parent.parent.parent / 'src' / 'scripts' / 'configure_modular.ps1'

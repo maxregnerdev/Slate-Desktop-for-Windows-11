@@ -491,7 +491,7 @@ if (Test-Path "$env:ProgramFiles\\MacType\\MacType.exe") {{
         profile = "Windows12_Hybrid"
         gamma = {self.config['font_rendering']['gamma']}
         contrast = {self.config['font_rendering']['contrast']}
-        subpixelRendering = $({self.config['font_rendering']['subpixel_rendering'] -as [int]})
+        subpixelRendering = $({self.config['font_rendering']['subpixel_rendering']} -as [int])
         hinting = "{self.config['font_rendering']['hinting']}"
     }}
     
