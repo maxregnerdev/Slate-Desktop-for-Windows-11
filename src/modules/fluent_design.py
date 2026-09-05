@@ -155,16 +155,26 @@ class FluentDesign3Module:
         """Check if all dependencies are installed"""
         missing_deps = []
         
+        # Only check on Windows
+        if platform.system() != 'Windows':
+            print(f"[!] Skipping dependency check on non-Windows platform")
+            return True
+        
         for dep in self.dependencies:
             try:
                 result = subprocess.run(
                     ['where', dep],
                     capture_output=True,
-                    text=True
+                    text=True,
+                    timeout=30
                 )
                 if result.returncode != 0:
                     missing_deps.append(dep)
-            except:
+            except subprocess.TimeoutExpired:
+                print(f"[!] Timeout checking dependency: {dep}")
+                missing_deps.append(dep)
+            except Exception as e:
+                print(f"[!] Error checking dependency {dep}: {e}")
                 missing_deps.append(dep)
         
         return len(missing_deps) == 0
@@ -173,34 +183,56 @@ class FluentDesign3Module:
         """Install required dependencies"""
         print(f"Installing dependencies for {self.name}...")
         
+        # Only install on Windows
+        if platform.system() != 'Windows':
+            print(f"[!] Skipping dependency installation on non-Windows platform")
+            return True
+        
         # Install via winget
         winget_commands = [
-            'winget install --id Maplespe.ExplorerBlurMica',
-            'winget install --id Maplespe.DWMBlurGlass',
-            'winget install --id MicaForEveryone.MicaForEveryone'
+            'winget install --id Maplespe.ExplorerBlurMica --accept-package-agreements --accept-source-agreements --silent',
+            'winget install --id Maplespe.DWMBlurGlass --accept-package-agreements --accept-source-agreements --silent',
+            'winget install --id MicaForEveryone.MicaForEveryone --accept-package-agreements --accept-source-agreements --silent'
         ]
         
         success_count = 0
         for cmd in winget_commands:
             try:
+                print(f"  Installing: {cmd.split()[-1]}...")
                 result = subprocess.run(
                     ['powershell', '-Command', cmd],
                     capture_output=True,
-                    text=True
+                    text=True,
+                    timeout=300  # 5 minutes max per dependency
                 )
                 if result.returncode == 0:
-                    print(f"[+] Installed: {cmd}")
+                    print(f"[+] Installed: {cmd.split()[-1]}")
                     success_count += 1
                 else:
-                    print(f"[-] Failed to install: {cmd}")
+                    print(f"[-] Failed to install: {cmd.split()[-1]}")
+                    if result.stderr:
+                        print(f"    Error: {result.stderr.strip()[:200]}")
+            except subprocess.TimeoutExpired:
+                print(f"[-] Timeout installing: {cmd.split()[-1]} (taking too long, skipping)")
             except Exception as e:
                 print(f"[-] Error installing dependency: {e}")
+        
+        if success_count < len(winget_commands):
+            print(f"[!] Some dependencies may need manual installation")
+            print(f"    Run: winget install --id Maplespe.ExplorerBlurMica")
+            print(f"    Run: winget install --id Maplespe.DWMBlurGlass")
+            print(f"    Run: winget install --id MicaForEveryone.MicaForEveryone")
         
         return success_count == len(winget_commands)
     
     def apply_registry_tweaks(self) -> bool:
         """Apply registry tweaks for Fluent Design 3.0"""
         print(f"Applying registry tweaks for {self.name}...")
+        
+        # Only apply on Windows
+        if platform.system() != 'Windows':
+            print(f"[!] Skipping registry tweaks on non-Windows platform")
+            return True
         
         tweaks = [
             {

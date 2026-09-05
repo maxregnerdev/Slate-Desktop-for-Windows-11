@@ -122,16 +122,26 @@ class FloatingTaskbarModule:
         """Check if all dependencies are installed"""
         missing_deps = []
         
+        # Only check on Windows
+        if platform.system() != 'Windows':
+            print(f"[!] Skipping dependency check on non-Windows platform")
+            return True
+        
         for dep in self.dependencies:
             try:
                 result = subprocess.run(
                     ['where', dep],
                     capture_output=True,
-                    text=True
+                    text=True,
+                    timeout=30
                 )
                 if result.returncode != 0:
                     missing_deps.append(dep)
-            except:
+            except subprocess.TimeoutExpired:
+                print(f"[!] Timeout checking dependency: {dep}")
+                missing_deps.append(dep)
+            except Exception as e:
+                print(f"[!] Error checking dependency {dep}: {e}")
                 missing_deps.append(dep)
         
         return len(missing_deps) == 0
@@ -140,34 +150,56 @@ class FloatingTaskbarModule:
         """Install required dependencies"""
         print(f"Installing dependencies for {self.name}...")
         
+        # Only install on Windows
+        if platform.system() != 'Windows':
+            print(f"[!] Skipping dependency installation on non-Windows platform")
+            return True
+        
         # Install via winget
         winget_commands = [
-            'winget install --id RamenSoftware.Windhawk',
-            'winget install --id valinet.ExplorerPatcher',
-            'winget install --id TranslucentTB.TranslucentTB'
+            'winget install --id RamenSoftware.Windhawk --accept-package-agreements --accept-source-agreements --silent',
+            'winget install --id valinet.ExplorerPatcher --accept-package-agreements --accept-source-agreements --silent',
+            'winget install --id TranslucentTB.TranslucentTB --accept-package-agreements --accept-source-agreements --silent'
         ]
         
         success_count = 0
         for cmd in winget_commands:
             try:
+                print(f"  Installing: {cmd.split()[-1]}...")
                 result = subprocess.run(
                     ['powershell', '-Command', cmd],
                     capture_output=True,
-                    text=True
+                    text=True,
+                    timeout=300  # 5 minutes max per dependency
                 )
                 if result.returncode == 0:
-                    print(f"[+] Installed: {cmd}")
+                    print(f"[+] Installed: {cmd.split()[-1]}")
                     success_count += 1
                 else:
-                    print(f"[-] Failed to install: {cmd}")
+                    print(f"[-] Failed to install: {cmd.split()[-1]}")
+                    if result.stderr:
+                        print(f"    Error: {result.stderr.strip()[:200]}")
+            except subprocess.TimeoutExpired:
+                print(f"[-] Timeout installing: {cmd.split()[-1]} (taking too long, skipping)")
             except Exception as e:
                 print(f"[-] Error installing dependency: {e}")
+        
+        if success_count < len(winget_commands):
+            print(f"[!] Some dependencies may need manual installation")
+            print(f"    Run: winget install --id RamenSoftware.Windhawk")
+            print(f"    Run: winget install --id valinet.ExplorerPatcher")
+            print(f"    Run: winget install --id TranslucentTB.TranslucentTB")
         
         return success_count == len(winget_commands)
     
     def apply_registry_tweaks(self) -> bool:
         """Apply registry tweaks for floating taskbar"""
         print(f"Applying registry tweaks for {self.name}...")
+        
+        # Only apply on Windows
+        if platform.system() != 'Windows':
+            print(f"[!] Skipping registry tweaks on non-Windows platform")
+            return True
         
         tweaks = [
             {
@@ -255,6 +287,25 @@ class FloatingTaskbarModule:
                 json.dump(windhawk_config, f, indent=4)
             
             print(f"[+] Windhawk configuration saved to {config_file}")
+            
+            # Try to apply Windhawk mods if Windhawk is installed
+            try:
+                windhawk_exe = Path('C:/Program Files/Windhawk/windhawk.exe')
+                if windhawk_exe.exists():
+                    print(f"  Applying Windhawk mods...")
+                    result = subprocess.run(
+                        [str(windhawk_exe), '--apply-mod', 'taskbar_floating'],
+                        capture_output=True,
+                        text=True,
+                        timeout=60
+                    )
+                    if result.returncode == 0:
+                        print(f"[+] Applied Windhawk mods")
+                    else:
+                        print(f"[!] Windhawk mod application may need manual run")
+            except Exception:
+                pass
+            
             return True
         except Exception as e:
             print(f"[-] Error configuring Windhawk: {e}")
@@ -284,6 +335,22 @@ class FloatingTaskbarModule:
                 json.dump(ttb_config, f, indent=4)
             
             print(f"[+] TranslucentTB configuration saved to {config_file}")
+            
+            # Try to restart TranslucentTB if running
+            try:
+                ttb_exe = Path.home() / 'AppData' / 'Local' / 'TranslucentTB' / 'TranslucentTB.exe'
+                if ttb_exe.exists():
+                    print(f"  Restarting TranslucentTB...")
+                    subprocess.run(
+                        ['taskkill', '/IM', 'TranslucentTB.exe', '/F'],
+                        capture_output=True,
+                        timeout=10
+                    )
+                    subprocess.Popen([str(ttb_exe)])
+                    print(f"[+] TranslucentTB restarted")
+            except Exception:
+                pass
+            
             return True
         except Exception as e:
             print(f"[-] Error configuring TranslucentTB: {e}")
@@ -334,6 +401,7 @@ Write-Host "Windows 12 Floating Taskbar configuration applied!" -ForegroundColor
                 f.write(script_content)
             
             print(f"[+] Taskbar script created: {script_file}")
+            print(f"[!] Run this script as Administrator to apply changes")
             return True
         except Exception as e:
             print(f"[-] Error creating taskbar script: {e}")
@@ -349,28 +417,35 @@ Write-Host "Windows 12 Floating Taskbar configuration applied!" -ForegroundColor
         success = True
         
         # Step 1: Check dependencies
+        print(f"[1/5] Checking dependencies...")
         if not self.check_dependencies():
             print(f"[!] Dependencies missing. Installing...")
             if not self.install_dependencies():
                 print(f"[-] Failed to install dependencies")
                 success = False
+        else:
+            print(f"[+] All dependencies already installed")
         
         # Step 2: Apply registry tweaks
+        print(f"\n[2/5] Applying registry tweaks...")
         if not self.apply_registry_tweaks():
             print(f"[-] Failed to apply registry tweaks")
             success = False
         
         # Step 3: Configure Windhawk
+        print(f"\n[3/5] Configuring Windhawk...")
         if not self.configure_windhawk():
             print(f"[-] Failed to configure Windhawk")
             success = False
         
         # Step 4: Configure TranslucentTB
+        print(f"\n[4/5] Configuring TranslucentTB...")
         if not self.configure_translucenttb():
             print(f"[-] Failed to configure TranslucentTB")
             success = False
         
         # Step 5: Create configuration script
+        print(f"\n[5/5] Creating configuration script...")
         if not self.create_taskbar_script():
             print(f"[-] Failed to create configuration script")
             success = False

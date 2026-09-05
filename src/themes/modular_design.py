@@ -216,6 +216,11 @@ class ModularDesignModule:
         """Apply registry tweaks for modular design"""
         print(f"Applying registry tweaks for {self.name}...")
         
+        # Only apply on Windows
+        if platform.system() != 'Windows':
+            print(f"[!] Skipping registry tweaks on non-Windows platform")
+            return True
+        
         tweaks = [
             {
                 'path': r'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced',
